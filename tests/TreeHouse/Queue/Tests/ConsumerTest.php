@@ -28,18 +28,18 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
 
     public function testConsume()
     {
-        $message = new Message('test', null, uniqid());
+        $messages = [
+            new Message('test', null, uniqid()),
+            new Message('test', null, uniqid()),
+        ];
 
-        $this->provider->expects($this->at(0))->method('get')->will($this->returnValue($message));
-        $this->provider->expects($this->at(1))->method('get')->will($this->returnValue($message));
-        $this->provider->expects($this->at(2))->method('get')->will($this->returnValue(null));
+        // keep returning messages until we run out of them
+        $this->provider->expects($this->any())->method('get')->will($this->returnCallback(function () use (&$messages) {
+            return empty($messages) ? null : array_shift($messages);
+        }));
 
-        $this->provider->expects($this->exactly(3))->method('get');
-
-        $this->processor
-            ->expects($this->exactly(2))
-            ->method('process')
-        ;
+        $this->provider->expects($this->exactly(sizeof($messages) + 1))->method('get');
+        $this->processor->expects($this->exactly(sizeof($messages)))->method('process');
 
         $consumer = new Consumer($this->provider, $this->processor);
         $consumer->consume();
