@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "07299c0840b9a21712b95bccc2656047",
+    "hash": "c0855dfa38777dae9686ccfef8eb451d",
     "packages": [
         {
             "name": "psr/log",
@@ -1387,7 +1387,7 @@
         "empi89/php-amqp-stubs": 20
     },
     "platform": {
-        "php": ">=5.4"
+        "php": ">=5.5"
     },
     "platform-dev": []
 }
