@@ -76,12 +76,15 @@ class AmqpFactory
      *
      * @return \AMQPQueue
      */
-    public function createQueue(\AMQPChannel $channel, $name, $flags = AMQP_NOPARAM, array $args = [])
+    public function createQueue(\AMQPChannel $channel, $name = null, $flags = AMQP_NOPARAM, array $args = [])
     {
         $queue = new \AMQPQueue($channel);
-        $queue->setName($name);
         $queue->setFlags($flags);
         $queue->setArguments($args);
+
+        if (null !== $name) {
+            $queue->setName($name);
+        }
 
         $queue->declareQueue();
 
