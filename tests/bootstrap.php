@@ -12,6 +12,6 @@ if (!file_exists($file)) {
  * @var ClassLoader $loader
  */
 $loader = require $file;
-$loader->add('TreeHouse\Queue\Tests', __DIR__ . '/TreeHouse/Queue/Tests');
+$loader->addPsr4('TreeHouse\\Queue\\Tests\\', __DIR__ . '/TreeHouse/Queue/Tests/');
 
 AnnotationRegistry::registerLoader([$loader, 'loadClass']);
