@@ -5,7 +5,6 @@ namespace TreeHouse\Queue\Tests\Message\Serializer;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Tests\Common\Persistence\ObjectManagerDecoratorTest;
 use TreeHouse\Queue\Message\Serializer\DoctrineSerializer;
 
 class DoctrineSerializerTest extends \PHPUnit_Framework_TestCase
@@ -44,6 +43,7 @@ class DoctrineSerializerTest extends \PHPUnit_Framework_TestCase
         $meta = $this->getMockBuilder(ClassMetadata::class)->getMock();
         $meta->expects($this->any())->method('getIdentifierValues')->will($this->returnCallback(function ($value) {
             /** @var EntityMock $value */
+
             return ['id' => $value->getId()];
         }));
 

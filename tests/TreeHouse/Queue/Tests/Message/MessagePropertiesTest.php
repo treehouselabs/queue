@@ -1,6 +1,6 @@
 <?php
 
-namespace TreeHouse\Queue\Tests;
+namespace TreeHouse\Queue\Tests\Message;
 
 use TreeHouse\Queue\Message\MessageProperties;
 
