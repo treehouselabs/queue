@@ -6,6 +6,14 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 class DoctrineSerializer implements SerializerInterface
 {
+    /**
+     * @var ManagerRegistry
+     */
+    protected $doctrine;
+
+    /**
+     * @param ManagerRegistry $doctrine
+     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
@@ -20,7 +28,7 @@ class DoctrineSerializer implements SerializerInterface
     }
 
     /**
-     * @param $value
+     * @param integer|object $value
      *
      * @return array
      */
@@ -29,7 +37,7 @@ class DoctrineSerializer implements SerializerInterface
         // if a raw identifier is passed, return it in an array.
         // this would be the same if we passed in an object with that id
         if (is_numeric($value)) {
-            return [$value];
+            return [intval($value)];
         }
 
         $class    = get_class($value);
