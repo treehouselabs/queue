@@ -5,7 +5,7 @@ namespace TreeHouse\Queue\Processor;
 use Psr\Log\LoggerInterface;
 use TreeHouse\Queue\Exception\ProcessExhaustedException;
 use TreeHouse\Queue\Message\Message;
-use TreeHouse\Queue\Message\Publisher\MessagePublisherInterface;
+use TreeHouse\Queue\Message\Provider\MessageProviderInterface;
 
 class RetryProcessor implements ProcessorInterface
 {
@@ -17,9 +17,9 @@ class RetryProcessor implements ProcessorInterface
     protected $processor;
 
     /**
-     * @var MessagePublisherInterface
+     * @var MessageProviderInterface
      */
-    protected $publisher;
+    protected $provider;
 
     /**
      * @var LoggerInterface
@@ -27,11 +27,9 @@ class RetryProcessor implements ProcessorInterface
     protected $logger;
 
     /**
-     * @todo make configurable
-     *
      * @var integer
      */
-    protected $maxAttempts = 3;
+    protected $maxAttempts = 2;
 
     /**
      * @var integer
@@ -39,14 +37,14 @@ class RetryProcessor implements ProcessorInterface
     protected $cooldownTime = 600;
 
     /**
-     * @param ProcessorInterface        $processor
-     * @param MessagePublisherInterface $publisher
-     * @param LoggerInterface           $logger
+     * @param ProcessorInterface       $processor
+     * @param MessageProviderInterface $provider
+     * @param LoggerInterface          $logger
      */
-    public function __construct(ProcessorInterface $processor, MessagePublisherInterface $publisher, LoggerInterface $logger = null)
+    public function __construct(ProcessorInterface $processor, MessageProviderInterface $provider, LoggerInterface $logger = null)
     {
         $this->processor = $processor;
-        $this->publisher = $publisher;
+        $this->provider  = $provider;
         $this->logger    = $logger;
     }
 
@@ -104,19 +102,44 @@ class RetryProcessor implements ProcessorInterface
     public function process(Message $message)
     {
         try {
-            $this->processor->process($message);
-        } catch (\Exception $e) {
-            $this->logger->warning($e->getMessage(), ['message' => $message->getId()]);
+            $result = $this->processor->process($message);
+        } catch (\Exception $exception) {
+            $result = false;
 
-            $attempt = $this->getAttemptValue($message);
-            if ($attempt >= $this->maxAttempts) {
-                throw new ProcessExhaustedException(sprintf('Exhausted after failing %d attempt(s)', $attempt), 0, $e);
+            if ($this->logger) {
+                $this->logger->warning($exception->getMessage(), ['message' => $message->getId()]);
             }
-
-            $message->getProperties()->set(self::PROPERTY_KEY, ++$attempt);
-
-            $this->publisher->publish($message, false, new \DateTime('@' . (time() + $this->cooldownTime)));
         }
+
+        if ($result !== true) {
+            $this->retryMessage($message);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Message    $message
+     *
+     * @throws ProcessExhaustedException
+     */
+    protected function retryMessage(Message $message)
+    {
+        $attempt = $this->getAttemptValue($message);
+        if ($attempt >= $this->maxAttempts) {
+            throw new ProcessExhaustedException(sprintf('Exhausted after failing %d attempt(s)', $attempt));
+        }
+
+        if ($this->logger) {
+            $this->logger->debug(sprintf('Requeueing message (%d attempts left)', $this->maxAttempts - $attempt));
+        }
+
+        $message->getProperties()->set(self::PROPERTY_KEY, ++$attempt);
+
+        // TODO: find a way to implement the cooldown period
+        // $date = new \DateTime('@' . (time() + $this->cooldownTime));
+
+        $this->provider->nack($message, true);
     }
 
     /**
