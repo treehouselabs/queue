@@ -67,8 +67,9 @@ class Consumer
     public function consume()
     {
         while (null !== $message = $this->messageProvider->get()) {
-            $this->processor->process($message);
-            $this->messageProvider->ack($message);
+            if ($this->processor->process($message)) {
+                $this->messageProvider->ack($message);
+            }
         }
     }
 }
