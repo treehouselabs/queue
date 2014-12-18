@@ -10,6 +10,11 @@ class MessageProperties implements \ArrayAccess
     const DELIVERY_MODE_NON_PERSISTENT = 1;
     const DELIVERY_MODE_PERSISTENT     = 2;
 
+    const KEY_CONTENT_TYPE  = 'content_type';
+    const KEY_DELIVERY_MODE = 'delivery_mode';
+    const KEY_PRIORITY      = 'priority';
+    const KEY_TIMESTAMP     = 'timestamp';
+
     /**
      * @var array
      */
@@ -109,21 +114,5 @@ class MessageProperties implements \ArrayAccess
     public function offsetUnset($offset)
     {
         $this->remove($offset);
-    }
-
-    /**
-     * @return string
-     */
-    public function getContentType()
-    {
-        return $this->get('content_type');
-    }
-
-    /**
-     * @return integer
-     */
-    public function getDeliveryMode()
-    {
-        return $this->get('delivery_mode');
     }
 }

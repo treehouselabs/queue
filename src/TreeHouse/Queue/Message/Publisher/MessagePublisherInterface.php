@@ -6,19 +6,22 @@ use TreeHouse\Queue\Message\Message;
 
 interface MessagePublisherInterface
 {
+    const DEFAULT_PRIORITY = 0;
+
     /**
-     * @param mixed $payload
+     * @param mixed   $payload  The message payload
+     * @param integer $priority Priority for the message, this must be a number between 0 (lowest) and 9 (highest)
      *
      * @return Message
      */
-    public function createMessage($payload);
+    public function createMessage($payload, $priority = self::DEFAULT_PRIORITY);
 
     /**
-     * @param Message   $message
-     * @param boolean   $priority
-     * @param \DateTime $date
+     * @param Message   $message The message
+     * @param \DateTime $date    The date to publish the message (not yet implemented!)
+     * @param integer   $flags   AMQP flags to publish the message with
      *
-     * @return boolean True on success, false on failure
+     * @return bool True on success, false on failure
      */
-    public function publish(Message $message, $priority = false, \DateTime $date = null);
+    public function publish(Message $message, \DateTime $date = null, $flags = AMQP_NOPARAM);
 }

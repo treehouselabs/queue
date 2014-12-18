@@ -65,7 +65,7 @@ class MessagePropertiesTest extends \PHPUnit_Framework_TestCase
             'delivery_mode' => MessageProperties::DELIVERY_MODE_NON_PERSISTENT,
         ]);
 
-        $this->assertSame(MessageProperties::CONTENT_TYPE_TEXT_PLAIN, $properties->getContentType());
-        $this->assertSame(MessageProperties::DELIVERY_MODE_NON_PERSISTENT, $properties->getDeliveryMode());
+        $this->assertSame(MessageProperties::CONTENT_TYPE_TEXT_PLAIN, $properties->get(MessageProperties::KEY_CONTENT_TYPE));
+        $this->assertSame(MessageProperties::DELIVERY_MODE_NON_PERSISTENT, $properties->get(MessageProperties::KEY_DELIVERY_MODE));
     }
 }

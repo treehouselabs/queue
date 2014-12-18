@@ -48,4 +48,28 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('route2', $message->getRoutingKey());
         $this->assertSame($props, $message->getProperties());
     }
+
+    public function testContentType()
+    {
+        $message = new Message('test');
+        $message->setContentType('text/xml');
+
+        $this->assertEquals('text/xml', $message->getContentType());
+    }
+
+    public function testDeliveryMode()
+    {
+        $message = new Message('test');
+        $message->setDeliveryMode(3);
+
+        $this->assertEquals(3, $message->getDeliveryMode());
+    }
+
+    public function testPriority()
+    {
+        $message = new Message('test');
+        $message->setPriority(3);
+
+        $this->assertEquals(3, $message->getPriority());
+    }
 }
