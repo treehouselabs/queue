@@ -37,36 +37,42 @@ class AmqpMessagePublisher implements MessagePublisherInterface
     /**
      * @inheritdoc
      */
-    public function createMessage($payload)
+    public function createMessage($payload, $priority = self::DEFAULT_PRIORITY)
     {
-        return $this->messageComposer->compose($payload);
+        $message = $this->messageComposer->compose($payload);
+        $message->setPriority($priority);
+
+        return $message;
     }
 
     /**
      * @inheritdoc
      */
-    public function publish(Message $message, $priority = false, \DateTime $date = null)
+    public function publish(Message $message, \DateTime $date = null, $flags = AMQP_NOPARAM)
     {
-        $body       = $message->getBody();
-        $route      = $message->getRoutingKey();
-        $flags      = (true === $priority) ? AMQP_IMMEDIATE : AMQP_NOPARAM;
-        $properties = $message->getProperties()->toArray();
-
         if ($date instanceof \DateTime) {
-            if (true === $priority) {
-                throw new \LogicException('You cannot set a publish date for a high priority message');
+            $seconds = $date->getTimestamp() - time();
+
+            if ($seconds < 0) {
+                throw new \OutOFBoundsException('You cannot publish a message in the past');
             }
 
-            if ($date < new \DateTime()) {
-                throw new \LogicException('You cannot publish a message in the past');
+            if ($message->getRoutingKey()) {
+                // since we're using the routing key for the deferred queue, we cannot use it here
+                throw new \LogicException('Publishing delayed messages with a routing key is unsupported at the moment');
             }
 
-            $route = $this->getDeferredQueue()->getName();
-            $flags = AMQP_NOPARAM;
-            $properties['ttl'] = $date->getTimestamp() - time();
+            // publish with the routing key set to the deferred queue
+//            $flags = AMQP_NOPARAM;
+//            $message->setRoutingKey($this->getDeferredQueueName());
+//            $message->getProperties()->set('ttl', $seconds);
         }
 
-        return $this->exchange->publish($body, $route, $flags, $properties);
+        $body  = $message->getBody();
+        $route = $message->getRoutingKey();
+        $props = $message->getProperties()->toArray();
+
+        return $this->exchange->publish($body, $route, $flags, $props);
     }
 
     /**
@@ -75,13 +81,14 @@ class AmqpMessagePublisher implements MessagePublisherInterface
     protected function getDeferredQueue()
     {
         if (null === $this->deferredQueue) {
-            $name = sprintf('%s.deferred', $this->exchange->getName());
+            $name = $this->getDeferredQueueName();
 
             $this->deferredQueue = new \AmqpQueue($this->exchange->getChannel());
             $this->deferredQueue->setName($name);
             $this->deferredQueue->setFlags(AMQP_DURABLE);
             $this->deferredQueue->setArguments([
                 'x-dead-letter-exchange' => $this->exchange->getName(),
+                'x-dead-letter-routing-key' => '',
                 'x-message-ttl'          => 600, // 10 minutes by default
             ]);
 
@@ -90,5 +97,13 @@ class AmqpMessagePublisher implements MessagePublisherInterface
         }
 
         return $this->deferredQueue;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDeferredQueueName()
+    {
+        return sprintf('%s.deferred', $this->exchange->getName());
     }
 }

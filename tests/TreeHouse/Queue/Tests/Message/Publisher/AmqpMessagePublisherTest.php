@@ -39,8 +39,15 @@ class AmqpMessagePublisherTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Message::class, $message);
         $this->assertEquals($body, $message->getBody());
-        $this->assertEquals(MessageProperties::CONTENT_TYPE_TEXT_PLAIN, $message->getProperties()->getContentType());
-        $this->assertEquals(MessageProperties::DELIVERY_MODE_PERSISTENT, $message->getProperties()->getDeliveryMode());
+        $this->assertEquals(MessageProperties::CONTENT_TYPE_TEXT_PLAIN, $message->getContentType());
+        $this->assertEquals(MessageProperties::DELIVERY_MODE_PERSISTENT, $message->getDeliveryMode());
+    }
+
+    public function testCreateMessageWithPriority()
+    {
+        $message = $this->publisher->createMessage('test', 4);
+
+        $this->assertEquals(4, $message->getPriority());
     }
 
     public function testPublish()
@@ -72,11 +79,11 @@ class AmqpMessagePublisherTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true))
         ;
 
-        $this->assertTrue($this->publisher->publish($message, true));
+        $this->assertTrue($this->publisher->publish($message, null, AMQP_IMMEDIATE));
     }
 
     /**
-     * @expectedException        \LogicException
+     * @expectedException        \OutOfBoundsException
      * @expectedExceptionMessage You cannot publish a message in the past
      */
     public function testPublishInThePast()
@@ -88,28 +95,7 @@ class AmqpMessagePublisherTest extends \PHPUnit_Framework_TestCase
             ->method('publish')
         ;
 
-        $this->publisher->publish($message, null, new \DateTime('-10 minutes'));
-    }
-
-    /**
-     * @expectedException        \LogicException
-     * @expectedExceptionMessage You cannot set a publish date for a high priority message
-     */
-    public function testScheduleHighPriority()
-    {
-        $message = $this->publisher->createMessage('test');
-
-        $this->exchange
-            ->expects($this->never())
-            ->method('publish')
-        ;
-
-        $this->publisher->publish($message, true, new \DateTime('+10 minutes'));
-    }
-
-    public function testPublishDelayed()
-    {
-        $this->markTestSkipped('Find out a way to mock the deferred queue first');
+        $this->publisher->publish($message, new \DateTime('-10 minutes'));
     }
 
     /**
