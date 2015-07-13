@@ -12,6 +12,15 @@ interface MessageProviderInterface
     public function get();
 
     /**
+     * Blocking function to consume next message
+     *
+     * @param callable $callback called when a message is available
+     *
+     * @return void
+     */
+    public function consume(callable $callback);
+
+    /**
      * @param Message $message The message to ACK
      *
      * @return void

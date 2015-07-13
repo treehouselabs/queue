@@ -51,4 +51,20 @@ class AmqpMessageProvider implements MessageProviderInterface
     {
         $this->queue->nack($message->getId(), $requeue ? AMQP_REQUEUE : null);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function consume(callable $callback)
+    {
+        $this->queue->consume(function(\AMQPEnvelope $envelope) use ($callback) {
+            $id    = $envelope->getDeliveryTag();
+            $body  = $envelope->getBody();
+            $props = new MessageProperties($envelope->getHeaders());
+
+            $message = new Message($body, $props, $id);
+
+            $callback($message);
+        });
+    }
 }

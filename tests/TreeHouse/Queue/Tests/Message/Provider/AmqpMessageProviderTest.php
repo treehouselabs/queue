@@ -45,6 +45,39 @@ class AmqpMessageProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($headers, $message->getProperties()->toArray());
     }
 
+    public function testConsume()
+    {
+        $id      = uniqid();
+        $body    = 'test';
+        $headers = ['foo' => 'bar'];
+
+        $envelope = $this->getMock(\AMQPEnvelope::class);
+        $envelope->expects($this->any())->method('getDeliveryTag')->will($this->returnValue($id));
+        $envelope->expects($this->any())->method('getBody')->will($this->returnValue($body));
+        $envelope->expects($this->any())->method('getHeaders')->will($this->returnValue($headers));
+
+        $callback = function($message) use ($id, $body, $headers) {
+            $this->assertInstanceOf(Message::class, $message);
+
+            $this->assertEquals($id, $message->getId());
+            $this->assertEquals($body, $message->getBody());
+            $this->assertEquals($headers, $message->getProperties()->toArray());
+        };
+
+        $this->queue
+            ->expects($this->once())
+            ->method('consume')
+            ->with($this->callback(function($callback) use ($envelope) {
+                $callback($envelope);
+
+                return true;
+            }))
+        ;
+
+        $provider = new AmqpMessageProvider($this->queue);
+        $provider->consume($callback);
+    }
+
     public function testReturnNullOnEmptyEnvelope()
     {
         $this->queue
