@@ -65,6 +65,9 @@ class AmqpMessageProvider implements MessageProviderInterface
             $message = new Message($body, $props, $id);
 
             $callback($message);
+            
+            // release blocking thread back to php
+            return false;
         });
     }
 }
