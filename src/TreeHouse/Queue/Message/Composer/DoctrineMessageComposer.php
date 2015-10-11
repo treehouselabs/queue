@@ -24,7 +24,7 @@ class DoctrineMessageComposer extends DefaultMessageComposer
      */
     public function __construct(ManagerRegistry $doctrine, SerializerInterface $serializer, $className)
     {
-        $this->doctrine  = $doctrine;
+        $this->doctrine = $doctrine;
         $this->className = $className;
 
         parent::__construct($serializer);

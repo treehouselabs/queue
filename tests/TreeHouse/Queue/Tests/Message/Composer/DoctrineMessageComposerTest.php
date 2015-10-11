@@ -10,7 +10,12 @@ use TreeHouse\Queue\Tests\Mock\ObjectMock;
 
 class DoctrineMessageComposerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
+    /**
+     * @test
+     *
+     * @return DoctrineMessageComposer
+     */
+    public function it_can_be_constructed()
     {
         $doctrine = $this->getDoctrineMock();
         $composer = new DoctrineMessageComposer($doctrine, new JsonSerializer(), ObjectMock::class);
@@ -19,7 +24,10 @@ class DoctrineMessageComposerTest extends \PHPUnit_Framework_TestCase
         return $composer;
     }
 
-    public function testCompose()
+    /**
+     * @test
+     */
+    public function it_can_compose_messages()
     {
         $doctrine = $this->getDoctrineMock();
         $composer = new DoctrineMessageComposer($doctrine, new JsonSerializer(), ObjectMock::class);
@@ -38,10 +46,13 @@ class DoctrineMessageComposerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
      * @dataProvider      getInvalidArguments
      * @expectedException \RuntimeException
+     *
+     * @param mixed $arg
      */
-    public function testInvalidArguments($arg)
+    public function it_cannot_compose_with_invalid_arguments($arg)
     {
         $doctrine = $this->getDoctrineMock();
         $composer = new DoctrineMessageComposer($doctrine, new JsonSerializer(), ObjectMock::class);
@@ -49,10 +60,13 @@ class DoctrineMessageComposerTest extends \PHPUnit_Framework_TestCase
         $composer->compose($arg);
     }
 
+    /**
+     * @return array
+     */
     public function getInvalidArguments()
     {
         return [
-            [new \stdClass],
+            [new \stdClass()],
             [false],
             [null],
         ];

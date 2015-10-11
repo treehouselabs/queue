@@ -7,22 +7,22 @@ class Message
     /**
      * @var string
      */
-    protected $id;
+    private $id;
 
     /**
      * @var string
      */
-    protected $body;
+    private $body;
 
     /**
      * @var MessageProperties
      */
-    protected $properties;
+    private $properties;
 
     /**
      * @var string
      */
-    protected $routingKey;
+    private $routingKey;
 
     /**
      * @param string                 $id
@@ -32,18 +32,18 @@ class Message
      */
     public function __construct($body, MessageProperties $properties = null, $id = null, $routingKey = null)
     {
-        $this->id         = $id;
-        $this->body       = $body;
+        $this->id = $id;
+        $this->body = $body;
         $this->properties = $properties ?: new MessageProperties();
         $this->routingKey = $routingKey;
     }
 
     /**
-     * Resets id and deep-clones properties
+     * Resets id and deep-clones properties.
      */
     public function __clone()
     {
-        $this->id         = null;
+        $this->id = null;
         $this->properties = new MessageProperties($this->properties->toArray());
     }
 
@@ -120,7 +120,7 @@ class Message
     }
 
     /**
-     * @param integer $deliveryMode
+     * @param int $deliveryMode
      */
     public function setDeliveryMode($deliveryMode)
     {
@@ -128,7 +128,7 @@ class Message
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getDeliveryMode()
     {
@@ -136,7 +136,7 @@ class Message
     }
 
     /**
-     * @param integer $priority
+     * @param int $priority
      */
     public function setPriority($priority)
     {
@@ -144,10 +144,26 @@ class Message
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getPriority()
     {
         return $this->properties->get(MessageProperties::KEY_PRIORITY);
+    }
+
+    /**
+     * @param int $timestamp
+     */
+    public function setTimestamp($timestamp)
+    {
+        $this->properties->set(MessageProperties::KEY_TIMESTAMP, (integer) $timestamp);
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestamp()
+    {
+        return $this->properties->get(MessageProperties::KEY_TIMESTAMP);
     }
 }

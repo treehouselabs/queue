@@ -22,16 +22,12 @@ interface MessageProviderInterface
 
     /**
      * @param Message $message The message to ACK
-     *
-     * @return void
      */
     public function ack(Message $message);
 
     /**
      * @param Message $message The message to NACK
-     * @param boolean $requeue Requeue the message in the queue?
-     *
-     * @return void
+     * @param bool    $requeue Requeue the message in the queue?
      */
     public function nack(Message $message, $requeue = false);
 }

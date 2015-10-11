@@ -10,11 +10,11 @@
   processIsolation            = "false"
   stopOnFailure               = "false"
   syntaxCheck                 = "false"
-  bootstrap                   = "tests/bootstrap.php">
+  bootstrap                   = "vendor/autoload.php">
 
   <testsuites>
-    <testsuite name="Queue">
-      <directory suffix="Test.php">./tests</directory>
+    <testsuite>
+      <directory>./tests</directory>
     </testsuite>
   </testsuites>
 

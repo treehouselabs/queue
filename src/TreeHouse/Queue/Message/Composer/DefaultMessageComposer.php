@@ -26,8 +26,8 @@ class DefaultMessageComposer implements MessageComposerInterface
      */
     public function compose($payload, array $properties = [], $id = null, $routingKey = null)
     {
-        $defaults   = [
-            'content_type'  => MessageProperties::CONTENT_TYPE_TEXT_PLAIN,
+        $defaults = [
+            'content_type' => MessageProperties::CONTENT_TYPE_TEXT_PLAIN,
             'delivery_mode' => MessageProperties::DELIVERY_MODE_PERSISTENT,
         ];
 

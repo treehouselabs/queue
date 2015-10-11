@@ -6,17 +6,23 @@ use TreeHouse\Queue\Message\MessageProperties;
 
 class MessagePropertiesTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
+    /**
+     * @test
+     */
+    public function it_can_be_constructed()
     {
         $properties = new MessageProperties([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
 
         $this->assertInstanceOf(MessageProperties::class, $properties);
         $this->assertEquals(['foo' => 'bar'], $properties->toArray());
     }
 
-    public function testGetSet()
+    /**
+     * @test
+     */
+    public function it_can_get_and_set()
     {
         $properties = new MessageProperties();
         $this->assertFalse($properties->has('foo'));
@@ -27,18 +33,22 @@ class MessagePropertiesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
      * @expectedException \OutOfBoundsException
      */
-    public function testGetNonExistingKey()
+    public function it_cannot_get_a_non_existing_key()
     {
         $properties = new MessageProperties();
         $properties->get('foo');
     }
 
-    public function testRemove()
+    /**
+     * @test
+     */
+    public function it_can_remove_a_property()
     {
         $properties = new MessageProperties([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
 
         $this->assertTrue($properties->has('foo'));
@@ -46,7 +56,10 @@ class MessagePropertiesTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($properties->has('foo'));
     }
 
-    public function testArrayAccess()
+    /**
+     * @test
+     */
+    public function it_can_use_array_access()
     {
         $properties = new MessageProperties();
         $properties['foo'] = 'bar';
@@ -56,16 +69,5 @@ class MessagePropertiesTest extends \PHPUnit_Framework_TestCase
         unset($properties['foo']);
 
         $this->assertFalse(isset($properties['foo']));
-    }
-
-    public function testSpecialGetters()
-    {
-        $properties = new MessageProperties([
-            'content_type'  => MessageProperties::CONTENT_TYPE_TEXT_PLAIN,
-            'delivery_mode' => MessageProperties::DELIVERY_MODE_NON_PERSISTENT,
-        ]);
-
-        $this->assertSame(MessageProperties::CONTENT_TYPE_TEXT_PLAIN, $properties->get(MessageProperties::KEY_CONTENT_TYPE));
-        $this->assertSame(MessageProperties::DELIVERY_MODE_NON_PERSISTENT, $properties->get(MessageProperties::KEY_DELIVERY_MODE));
     }
 }

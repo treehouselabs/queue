@@ -1,37 +1,41 @@
 <?php
 
-namespace TreeHouse\Queue\Message\Publisher;
+namespace TreeHouse\Queue\Amqp\Driver\Amqp\Publisher;
 
-use TreeHouse\Queue\Message\Message;
+use TreeHouse\Queue\Amqp\Driver\Amqp\AmqpFactory;
+use TreeHouse\Queue\Amqp\ExchangeInterface;
+use TreeHouse\Queue\Amqp\QueueInterface;
 use TreeHouse\Queue\Message\Composer\MessageComposerInterface;
+use TreeHouse\Queue\Message\Message;
+use TreeHouse\Queue\Message\Publisher\MessagePublisherInterface;
 
 class AmqpMessagePublisher implements MessagePublisherInterface
 {
     /**
-     * @var \AmqpExchange
+     * @var ExchangeInterface
      */
     protected $exchange;
 
     /**
      * @var MessageComposerInterface
      */
-    protected $messageComposer;
+    protected $composer;
 
     /**
-     * Automatically created queue for deferred messages
+     * Automatically created queue for deferred messages.
      *
-     * @var \AmqpQueue
+     * @var QueueInterface
      */
     protected $deferredQueue;
 
     /**
-     * @param \AMQPExchange            $exchange
-     * @param MessageComposerInterface $messageComposer
+     * @param ExchangeInterface        $exchange
+     * @param MessageComposerInterface $composer
      */
-    public function __construct(\AMQPExchange $exchange, MessageComposerInterface $messageComposer)
+    public function __construct(ExchangeInterface $exchange, MessageComposerInterface $composer)
     {
-        $this->exchange        = $exchange;
-        $this->messageComposer = $messageComposer;
+        $this->exchange = $exchange;
+        $this->composer = $composer;
     }
 
     /**
@@ -39,7 +43,7 @@ class AmqpMessagePublisher implements MessagePublisherInterface
      */
     public function createMessage($payload, $priority = self::DEFAULT_PRIORITY)
     {
-        $message = $this->messageComposer->compose($payload);
+        $message = $this->composer->compose($payload);
         $message->setPriority($priority);
 
         return $message;
@@ -48,7 +52,7 @@ class AmqpMessagePublisher implements MessagePublisherInterface
     /**
      * @inheritdoc
      */
-    public function publish(Message $message, \DateTime $date = null, $flags = AMQP_NOPARAM)
+    public function publish(Message $message, \DateTime $date = null, $flags = ExchangeInterface::NOPARAM)
     {
         if ($date instanceof \DateTime) {
             $seconds = $date->getTimestamp() - time();
@@ -63,12 +67,12 @@ class AmqpMessagePublisher implements MessagePublisherInterface
             }
 
             // publish with the routing key set to the deferred queue
-//            $flags = AMQP_NOPARAM;
+//            $flags = ExchangeInterface::NOPARAM;
 //            $message->setRoutingKey($this->getDeferredQueueName());
 //            $message->getProperties()->set('ttl', $seconds);
         }
 
-        $body  = $message->getBody();
+        $body = $message->getBody();
         $route = $message->getRoutingKey();
         $props = $message->getProperties()->toArray();
 
@@ -83,16 +87,18 @@ class AmqpMessagePublisher implements MessagePublisherInterface
         if (null === $this->deferredQueue) {
             $name = $this->getDeferredQueueName();
 
-            $this->deferredQueue = new \AmqpQueue($this->exchange->getChannel());
-            $this->deferredQueue->setName($name);
-            $this->deferredQueue->setFlags(AMQP_DURABLE);
-            $this->deferredQueue->setArguments([
-                'x-dead-letter-exchange' => $this->exchange->getName(),
-                'x-dead-letter-routing-key' => '',
-                'x-message-ttl'          => 600, // 10 minutes by default
-            ]);
+            $factory = new AmqpFactory();
+            $this->deferredQueue = $factory->createQueue(
+                $this->exchange->getChannel(),
+                $name,
+                QueueInterface::DURABLE,
+                [
+                    'x-dead-letter-exchange' => $this->exchange->getName(),
+                    'x-dead-letter-routing-key' => '',
+                    'x-message-ttl' => 600, // 10 minutes by default
+                ]
+            );
 
-            $this->deferredQueue->declareQueue();
             $this->deferredQueue->bind($this->exchange->getName(), $name);
         }
 

@@ -13,7 +13,7 @@ interface ProcessorInterface
      *
      * @param Message $message
      *
-     * @return boolean False if the message could not be processed, true otherwise
+     * @return bool False if the message could not be processed, true otherwise
      */
     public function process(Message $message);
 }

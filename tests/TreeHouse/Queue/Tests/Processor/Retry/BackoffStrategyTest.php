@@ -9,13 +9,16 @@ use TreeHouse\Queue\Processor\Retry\RetryProcessor;
 
 class BackoffStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    public function testRetry()
+    /**
+     * @test
+     */
+    public function it_can_retry_a_message()
     {
         $message = new Message('test');
         $message->setRoutingKey('foo');
         $message->getProperties()->set('foo', 'bar');
 
-        $attempt      = 2;
+        $attempt = 2;
         $cooldownTime = 60;
         $cooldownDate = \DateTime::createFromFormat('U', time() + ($attempt * $cooldownTime));
 
@@ -57,7 +60,7 @@ class BackoffStrategyTest extends \PHPUnit_Framework_TestCase
         ;
 
         $strategy = new BackoffStrategy($publisher, $cooldownTime);
-        $result   = $strategy->retry($message, $attempt);
+        $result = $strategy->retry($message, $attempt);
 
         $this->assertTrue($result);
     }

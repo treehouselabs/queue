@@ -13,9 +13,9 @@ class JmsSerializer implements SerializerInterface
     protected $serializer;
 
     /**
-     * @var string[]
+     * @var SerializationContext
      */
-    protected $groups;
+    protected $context;
 
     /**
      * @var string
@@ -23,15 +23,15 @@ class JmsSerializer implements SerializerInterface
     protected $format;
 
     /**
-     * @param BaseSerializer $serializer
-     * @param string[]       $groups
-     * @param string         $format
+     * @param BaseSerializer       $serializer
+     * @param SerializationContext $context
+     * @param string               $format
      */
-    public function __construct(BaseSerializer $serializer, array $groups = [], $format = 'json')
+    public function __construct(BaseSerializer $serializer, SerializationContext $context = null, $format = 'json')
     {
         $this->serializer = $serializer;
-        $this->groups     = $groups;
-        $this->format     = $format;
+        $this->context = $context ?: SerializationContext::create();
+        $this->format = $format;
     }
 
     /**
@@ -39,11 +39,6 @@ class JmsSerializer implements SerializerInterface
      */
     public function serialize($value)
     {
-        $context = SerializationContext::create();
-        if (!empty($this->groups)) {
-            $context->setGroups($this->groups);
-        }
-
-        return $this->serializer->serialize($value, $this->format, $context);
+        return $this->serializer->serialize($value, $this->format, $this->context);
     }
 }

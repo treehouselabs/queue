@@ -18,15 +18,13 @@ class Consumer
     protected $processor;
 
     /**
-     * Constructor
-     *
      * @param MessageProviderInterface $messageProvider
      * @param ProcessorInterface       $processor
      */
     public function __construct(MessageProviderInterface $messageProvider, ProcessorInterface $processor)
     {
         $this->messageProvider = $messageProvider;
-        $this->processor       = $processor;
+        $this->processor = $processor;
     }
 
     /**
@@ -62,7 +60,7 @@ class Consumer
     }
 
     /**
-     * Consumes messages
+     * Consumes messages.
      */
     public function consume()
     {

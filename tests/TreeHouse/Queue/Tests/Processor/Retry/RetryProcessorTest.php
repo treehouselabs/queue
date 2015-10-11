@@ -9,14 +9,20 @@ use TreeHouse\Queue\Processor\Retry\RetryStrategyInterface;
 
 class RetryProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
+    /**
+     * @test
+     */
+    public function it_can_be_constructed()
     {
         $processor = new RetryProcessor($this->getProcessorMock(), $this->getStrategyMock());
 
         $this->assertInstanceOf(RetryProcessor::class, $processor);
     }
 
-    public function testGettersAndSetters()
+    /**
+     * @test
+     */
+    public function it_can_get_and_set()
     {
         $processor = new RetryProcessor($this->getProcessorMock(), $this->getStrategyMock());
 
@@ -31,9 +37,12 @@ class RetryProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($processor2, $processor->getProcessor());
     }
 
-    public function testProcessSuccess()
+    /**
+     * @test
+     */
+    public function it_can_process_a_message()
     {
-        $inner    = $this->getProcessorMock();
+        $inner = $this->getProcessorMock();
         $strategy = $this->getStrategyMock();
 
         /** @var RetryProcessor|\PHPUnit_Framework_MockObject_MockObject $processor */
@@ -50,9 +59,12 @@ class RetryProcessorTest extends \PHPUnit_Framework_TestCase
         $processor->process(new Message('test'));
     }
 
-    public function testProcessFailed()
+    /**
+     * @test
+     */
+    public function it_cannot_process_a_message()
     {
-        $inner    = $this->getProcessorMock();
+        $inner = $this->getProcessorMock();
         $strategy = $this->getStrategyMock();
 
         $processor = new RetryProcessor($inner, $strategy);
@@ -65,9 +77,12 @@ class RetryProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($result, 'The ->process() method should return the value from the strategy');
     }
 
-    public function testProcessException()
+    /**
+     * @test
+     */
+    public function it_cannot_process_with_exception()
     {
-        $inner    = $this->getProcessorMock();
+        $inner = $this->getProcessorMock();
         $strategy = $this->getStrategyMock();
 
         $processor = new RetryProcessor($inner, $strategy);
@@ -81,11 +96,12 @@ class RetryProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
      * @expectedException \TreeHouse\Queue\Exception\ProcessExhaustedException
      */
-    public function testMaxRetries()
+    public function it_cannot_exceed_max_retries()
     {
-        $inner    = $this->getProcessorMock();
+        $inner = $this->getProcessorMock();
         $strategy = $this->getStrategyMock();
 
         $inner->expects($this->any())->method('process')->will($this->returnValue(false));

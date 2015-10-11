@@ -3,8 +3,8 @@
 namespace TreeHouse\Queue\Exception;
 
 /**
- * Base exception for all consumer-related exceptions
+ * Base exception for all consumer-related exceptions.
  */
-class ConsumerException extends QueueException
+class ConsumerException extends AmqpException
 {
 }

@@ -7,27 +7,32 @@ cache:
 services:
   - rabbitmq
 
-language: php
+env:
+  - PREFER_LOWEST="--prefer-lowest"
+  - PREFER_LOWEST=""
 
+language: php
 php:
   - 5.5
   - 5.6
-  # - 7.0  enable when amqp extension is available
-  # - hhvm enable when amqp extension is available
+  - 7.0
+  - hhvm
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - php: hhvm
 
 install:
-  - pecl install -f amqp
+  - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo yes | pecl install amqp-1.7.0alpha1; fi;
+  - if [[ "$TRAVIS_PHP_VERSION" != "hhvm" ]]; then echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi;
 
 before_script:
   - travis_retry composer self-update
-  - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-source
+  - travis_retry composer update --no-interaction --prefer-source "$PREFER_LOWEST"
 
 script:
   - ./vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
 after_script:
-  - wget https://scrutinizer-ci.com/ocular.phar
-  - if [[ $TRAVIS_PHP_VERSION == '5.6' ]]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
+  - if [[ "$TRAVIS_PHP_VERSION" == "7.0" ]]; then wget https://scrutinizer-ci.com/ocular.phar; php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
