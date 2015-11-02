@@ -3,34 +3,12 @@ root = true
 
 ; Unix-style newlines
 [*]
+charset = utf-8
 end_of_line = lf
+indent_size = 2
 indent_style = space
+insert_final_newline = true
 trim_trailing_whitespace = true
 
 [*.php]
 indent_size = 4
-insert_final_newline = true
-
-[*.scss]
-indent_size = 2
-
-[*.less]
-indent_size = 2
-
-[*.js]
-indent_size = 2
-
-[*.html]
-indent_size = 2
-
-[*.twig]
-indent_size = 2
-
-[*.xml]
-indent_size = 2
-
-[*.yml]
-indent_size = 2
-
-[*.sls]
-indent_size = 2
