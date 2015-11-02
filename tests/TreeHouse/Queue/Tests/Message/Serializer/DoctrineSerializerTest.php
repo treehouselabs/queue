@@ -22,24 +22,32 @@ class DoctrineSerializerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(DoctrineSerializer::class, $serializer);
     }
 
-    /**
-     * @dataProvider getTestData
-     *
-     * @param mixed  $value
-     * @param string $expected
-     */
-    public function testSerialize($value, $expected)
+    public function testSerialize()
     {
+        $object = new ObjectMock(1234);
+
         $serializer = new DoctrineSerializer($this->doctrine);
-        $this->assertEquals($expected, $serializer->serialize($value));
+        $this->assertEquals('{"id":1234}', $serializer->serialize($object));
     }
 
-    public function getTestData()
+    /**
+     * @dataProvider getInvalidTestData
+     * @expectedException \InvalidArgumentException
+     *
+     * @param mixed $value
+     */
+    public function testInvalidArgument($value)
+    {
+        $serializer = new DoctrineSerializer($this->doctrine);
+        $serializer->serialize($value);
+    }
+
+    public function getInvalidTestData()
     {
         return [
-            [2, "[2]"],   // assume integers are identifiers
-            ["2", "[2]"], // cast numeric values to integers
-            [new ObjectMock(1234), "[1234]"]
+            [1234],
+            ['1234'],
+            [[1234]],
         ];
     }
 
