@@ -28,22 +28,21 @@ class DoctrineSerializer implements SerializerInterface
     }
 
     /**
-     * @param integer|object $value
+     * @param object $value
+     *
+     * @throws \InvalidArgumentException When $value is not a Doctrine object
      *
      * @return array
      */
     protected function getIdentifierValues($value)
     {
-        // if a raw identifier is passed, return it in an array.
-        // this would be the same if we passed in an object with that id
-        if (is_numeric($value)) {
-            return [intval($value)];
+        if (!is_object($value)) {
+            throw new \InvalidArgumentException('Only Doctrine objects can be serialized');
         }
 
-        $class    = get_class($value);
+        $class = get_class($value);
         $metadata = $this->doctrine->getManager()->getClassMetadata($class);
-        $id       = $metadata->getIdentifierValues($value);
 
-        return array_values($id);
+        return $metadata->getIdentifierValues($value);
     }
 }
