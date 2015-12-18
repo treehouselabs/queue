@@ -38,8 +38,6 @@ abstract class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     *
-     * @return ConnectionInterface
      */
     public function it_can_create_a_connection()
     {
@@ -57,14 +55,10 @@ abstract class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo_user', $connection->getLogin());
         $this->assertEquals('foo_pass', $connection->getPassword());
         $this->assertEquals('/foo', $connection->getVhost());
-
-        return $connection;
     }
 
     /**
      * @test
-     *
-     * @return ChannelInterface
      */
     public function it_can_create_a_channel()
     {
@@ -78,12 +72,11 @@ abstract class AbstractFactoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @depends it_can_create_a_channel
-     *
-     * @param ChannelInterface $channel
      */
-    public function it_can_create_an_exchange(ChannelInterface $channel)
+    public function it_can_create_an_exchange()
     {
+        $connection = $this->factory->createConnection('localhost');
+        $channel = $this->factory->createChannel($connection);
         $exchange = $this->factory->createExchange($channel, 'xchg1');
 
         $this->assertInstanceOf(ExchangeInterface::class, $exchange);

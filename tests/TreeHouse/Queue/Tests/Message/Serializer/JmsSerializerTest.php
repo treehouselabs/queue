@@ -60,7 +60,7 @@ class JmsSerializerTest extends \PHPUnit_Framework_TestCase
             )
         ;
 
-        $serializer = new JmsSerializer($this->jmsSerializer, $context, $format);
+        $serializer = new JmsSerializer($this->jmsSerializer, $format, $context);
         $serializer->serialize([1234]);
     }
 }

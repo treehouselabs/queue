@@ -117,6 +117,9 @@ class CachedFactory implements FactoryInterface
         return $queue;
     }
 
+    /**
+     * Removes all queues, exchanges and closes connections that were created during the test.
+     */
     public function clear()
     {
         foreach ($this->queues as $queue) {

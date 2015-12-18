@@ -24,14 +24,14 @@ class JmsSerializer implements SerializerInterface
 
     /**
      * @param BaseSerializer       $serializer
-     * @param SerializationContext $context
      * @param string               $format
+     * @param SerializationContext $context
      */
-    public function __construct(BaseSerializer $serializer, SerializationContext $context = null, $format = 'json')
+    public function __construct(BaseSerializer $serializer, $format = 'json', SerializationContext $context = null)
     {
         $this->serializer = $serializer;
-        $this->context = $context ?: SerializationContext::create();
         $this->format = $format;
+        $this->context = $context ?: SerializationContext::create();
     }
 
     /**

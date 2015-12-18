@@ -37,10 +37,10 @@ class Queue implements QueueInterface
      * @param \AMQPQueue       $delegate
      * @param ChannelInterface $channel
      */
-    public function __construct(\AMQPQueue $delegate, ChannelInterface &$channel)
+    public function __construct(\AMQPQueue $delegate, ChannelInterface $channel)
     {
         $this->delegate = $delegate;
-        $this->channel = &$channel;
+        $this->channel = $channel;
     }
 
     /**
