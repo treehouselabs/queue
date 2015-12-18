@@ -10,7 +10,12 @@ use TreeHouse\Queue\Message\Serializer\PhpSerializer;
 
 class DefaultMessageComposerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
+    /**
+     * @test
+     *
+     * @return DefaultMessageComposer
+     */
+    public function it_can_be_constructed()
     {
         $composer = new DefaultMessageComposer(new PhpSerializer());
         $this->assertInstanceOf(DefaultMessageComposer::class, $composer);
@@ -19,28 +24,22 @@ class DefaultMessageComposerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testConstructor
+     * @test
+     * @depends it_can_be_constructed
+     *
+     * @param DefaultMessageComposer $composer
      */
-    public function testCompose(DefaultMessageComposer $composer)
+    public function it_can_compose_messages(DefaultMessageComposer $composer)
     {
-        $message = $composer->compose('test');
-
-        $this->assertInstanceOf(Message::class, $message);
-        $this->assertEquals('test', $message->getBody());
-        $this->assertInstanceOf(MessageProperties::class, $message->getProperties());
-    }
-
-    /**
-     * @depends testConstructor
-     */
-    public function testComposeArguments(DefaultMessageComposer $composer)
-    {
-        $id         = 'msgid';
-        $body       = 'test';
-        $route      = 'foo_route';
+        $id = 'msgid';
+        $body = 'test';
+        $route = 'foo_route';
         $properties = ['foo' => 'bar'];
 
         $message = $composer->compose($body, $properties, $id, $route);
+
+        $this->assertInstanceOf(Message::class, $message);
+        $this->assertInstanceOf(MessageProperties::class, $message->getProperties());
 
         $this->assertEquals($body, $message->getBody());
         $this->assertEquals($id, $message->getId());
@@ -49,7 +48,10 @@ class DefaultMessageComposerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $message->getProperties()->get('foo'));
     }
 
-    public function testSerialize()
+    /**
+     * @test
+     */
+    public function it_serializes_messages()
     {
         $composer = new DefaultMessageComposer(new JsonSerializer());
         $message = $composer->compose(['test']);

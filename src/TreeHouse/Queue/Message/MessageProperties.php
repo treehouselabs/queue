@@ -4,25 +4,23 @@ namespace TreeHouse\Queue\Message;
 
 class MessageProperties implements \ArrayAccess
 {
-    const CONTENT_TYPE_BASIC      = 'application/octet-stream';
+    const CONTENT_TYPE_BASIC = 'application/octet-stream';
     const CONTENT_TYPE_TEXT_PLAIN = 'text/plain';
 
     const DELIVERY_MODE_NON_PERSISTENT = 1;
-    const DELIVERY_MODE_PERSISTENT     = 2;
+    const DELIVERY_MODE_PERSISTENT = 2;
 
-    const KEY_CONTENT_TYPE  = 'content_type';
+    const KEY_CONTENT_TYPE = 'content_type';
     const KEY_DELIVERY_MODE = 'delivery_mode';
-    const KEY_PRIORITY      = 'priority';
-    const KEY_TIMESTAMP     = 'timestamp';
+    const KEY_PRIORITY = 'priority';
+    const KEY_TIMESTAMP = 'timestamp';
 
     /**
      * @var array
      */
-    protected $properties = [];
+    private $properties = [];
 
     /**
-     * Constructor.
-     *
      * @param array $properties Some default properties will be set if undefined:
      *                          content_type = text/plain and delivery_mode = 2 (persistent)
      */
@@ -45,7 +43,7 @@ class MessageProperties implements \ArrayAccess
     /**
      * @param string $key
      *
-     * @return boolean
+     * @return bool
      */
     public function has($key)
     {
@@ -55,9 +53,9 @@ class MessageProperties implements \ArrayAccess
     /**
      * @param string $key
      *
+     * @throws \OutOfBoundsException If the key does not exist
      * @return mixed
      *
-     * @throws \OutOfBoundsException If the key does not exist
      */
     public function get($key)
     {

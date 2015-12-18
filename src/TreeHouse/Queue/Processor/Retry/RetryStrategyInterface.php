@@ -8,9 +8,9 @@ interface RetryStrategyInterface
 {
     /**
      * @param Message $message The message to retry
-     * @param integer $attempt The next attempt value
+     * @param int     $attempt The next attempt value
      *
-     * @return boolean The result to pass to the process function
+     * @return bool The result to pass to the process function
      */
     public function retry(Message $message, $attempt);
 }

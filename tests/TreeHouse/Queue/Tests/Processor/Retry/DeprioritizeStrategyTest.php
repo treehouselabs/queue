@@ -9,12 +9,15 @@ use TreeHouse\Queue\Processor\Retry\RetryProcessor;
 
 class DeprioritizeStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    public function testRetry()
+    /**
+     * @test
+     */
+    public function it_can_retry_a_message()
     {
-        $attempt    = 2;
-        $body       = 'test';
+        $attempt = 2;
+        $body = 'test';
         $routingKey = 'foo';
-        $priority   = 3;
+        $priority = 3;
 
         $message = new Message($body);
         $message->setRoutingKey($routingKey);

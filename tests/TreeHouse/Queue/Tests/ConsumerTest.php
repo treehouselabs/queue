@@ -19,14 +19,36 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
      */
     protected $processor;
 
-    public function testConstructor()
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
+    {
+        $this->provider = $this
+            ->getMockBuilder(MessageProviderInterface::class)
+            ->getMockForAbstractClass()
+        ;
+
+        $this->processor = $this
+            ->getMockBuilder(ProcessorInterface::class)
+            ->getMockForAbstractClass()
+        ;
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_be_constructed()
     {
         $consumer = new Consumer($this->provider, $this->processor);
 
         $this->assertInstanceOf(Consumer::class, $consumer);
     }
 
-    public function testConsume()
+    /**
+     * @test
+     */
+    public function it_can_consume_messages()
     {
         $messages = [
             new Message('test', null, uniqid()),
@@ -43,21 +65,5 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
 
         $consumer = new Consumer($this->provider, $this->processor);
         $consumer->consume();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function setUp()
-    {
-        $this->provider = $this
-            ->getMockBuilder(MessageProviderInterface::class)
-            ->getMockForAbstractClass()
-        ;
-
-        $this->processor = $this
-            ->getMockBuilder(ProcessorInterface::class)
-            ->getMockForAbstractClass()
-        ;
     }
 }

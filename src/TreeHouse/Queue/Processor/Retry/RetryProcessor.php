@@ -30,12 +30,12 @@ class RetryProcessor implements ProcessorInterface
     protected $logger;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $maxAttempts = 2;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $cooldownTime = 600;
 
@@ -47,8 +47,8 @@ class RetryProcessor implements ProcessorInterface
     public function __construct(ProcessorInterface $processor, RetryStrategyInterface $strategy, LoggerInterface $logger = null)
     {
         $this->processor = $processor;
-        $this->strategy  = $strategy;
-        $this->logger    = $logger;
+        $this->strategy = $strategy;
+        $this->logger = $logger;
     }
 
     /**
@@ -68,7 +68,7 @@ class RetryProcessor implements ProcessorInterface
     }
 
     /**
-     * @param integer $cooldownTime
+     * @param int $cooldownTime
      */
     public function setCooldownTime($cooldownTime)
     {
@@ -76,7 +76,7 @@ class RetryProcessor implements ProcessorInterface
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getCooldownTime()
     {
@@ -84,7 +84,7 @@ class RetryProcessor implements ProcessorInterface
     }
 
     /**
-     * @param integer $maxAttempts
+     * @param int $maxAttempts
      */
     public function setMaxAttempts($maxAttempts)
     {
@@ -92,7 +92,7 @@ class RetryProcessor implements ProcessorInterface
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getMaxAttempts()
     {
@@ -126,7 +126,7 @@ class RetryProcessor implements ProcessorInterface
      *
      * @throws ProcessExhaustedException
      *
-     * @return boolean
+     * @return bool
      */
     protected function retryMessage(Message $message)
     {
@@ -147,7 +147,7 @@ class RetryProcessor implements ProcessorInterface
      *
      * @throws \LogicException
      *
-     * @return integer
+     * @return int
      */
     protected function getAttemptValue(Message $message)
     {

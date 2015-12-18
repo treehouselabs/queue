@@ -7,26 +7,32 @@ use TreeHouse\Queue\Message\MessageProperties;
 
 class MessageTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
+    /**
+     * @test
+     */
+    public function it_can_be_constructed()
     {
-        $body    = 'test';
+        $body = 'test';
         $message = new Message($body);
 
         $this->assertInstanceOf(Message::class, $message);
         $this->assertEquals($body, $message->getBody());
     }
 
-    public function testArguments()
+    /**
+     * @test
+     */
+    public function it_can_be_constructed_with_arguments()
     {
-        $id    = uniqid();
-        $body  = 'test';
+        $id = uniqid();
+        $body = 'test';
         $route = 'foo_route';
         $props = [
             'foo' => 'bar',
         ];
 
         $properties = new MessageProperties($props);
-        $message    = new Message($body, $properties, $id, $route);
+        $message = new Message($body, $properties, $id, $route);
 
         $this->assertEquals($id, $message->getId());
         $this->assertEquals($body, $message->getBody());
@@ -35,7 +41,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $message->getProperties()->get('foo'));
     }
 
-    public function testGettersAndSetters()
+    /**
+     * @test
+     */
+    public function it_can_get_and_set()
     {
         $props = new MessageProperties(['foo' => 'bar']);
 
@@ -49,7 +58,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($props, $message->getProperties());
     }
 
-    public function testContentType()
+    /**
+     * @test
+     */
+    public function it_can_set_content_type()
     {
         $message = new Message('test');
         $message->setContentType('text/xml');
@@ -57,7 +69,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('text/xml', $message->getContentType());
     }
 
-    public function testDeliveryMode()
+    /**
+     * @test
+     */
+    public function it_can_set_delivery_mode()
     {
         $message = new Message('test');
         $message->setDeliveryMode(3);
@@ -65,7 +80,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $message->getDeliveryMode());
     }
 
-    public function testPriority()
+    /**
+     * @test
+     */
+    public function it_can_set_priority()
     {
         $message = new Message('test');
         $message->setPriority(3);

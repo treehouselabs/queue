@@ -6,7 +6,10 @@ use TreeHouse\Queue\Message\Serializer\JsonSerializer;
 
 class JsonSerializerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
+    /**
+     * @test
+     */
+    public function it_can_be_constructed()
     {
         $serializer = new JsonSerializer();
 
@@ -14,17 +17,21 @@ class JsonSerializerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
      * @dataProvider getTestData
      *
      * @param mixed  $value
      * @param string $expected
      */
-    public function testSerialize($value, $expected)
+    public function it_can_serialize($value, $expected)
     {
         $serializer = new JsonSerializer();
         $this->assertEquals($expected, $serializer->serialize($value));
     }
 
+    /**
+     * @return array
+     */
     public function getTestData()
     {
         return [

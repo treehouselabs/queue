@@ -2,7 +2,6 @@
 
 namespace TreeHouse\Queue\Tests\Message\Serializer;
 
-use JMS\Serializer\Exclusion\GroupsExclusionStrategy;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use TreeHouse\Queue\Message\Serializer\JmsSerializer;
@@ -14,14 +13,28 @@ class JmsSerializerTest extends \PHPUnit_Framework_TestCase
      */
     protected $jmsSerializer;
 
-    public function testConstructor()
+    /**
+     * @inheritdoc
+     */
+    protected function setUp()
+    {
+        $this->jmsSerializer = $this->getMockBuilder(SerializerInterface::class)->getMockForAbstractClass();
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_be_constructed()
     {
         $serializer = new JmsSerializer($this->jmsSerializer);
 
         $this->assertInstanceOf(JmsSerializer::class, $serializer);
     }
 
-    public function testSerialize()
+    /**
+     * @test
+     */
+    public function it_can_serialize()
     {
         $this->jmsSerializer->expects($this->once())->method('serialize');
 
@@ -29,10 +42,13 @@ class JmsSerializerTest extends \PHPUnit_Framework_TestCase
         $serializer->serialize([1234]);
     }
 
-    public function testFormatAndGroups()
+    /**
+     * @test
+     */
+    public function it_can_serialize_with_context_and_format()
     {
         $format = 'yml';
-        $groups = ['foo'];
+        $context = SerializationContext::create()->setGroups(['foo']);
 
         $this->jmsSerializer
             ->expects($this->once())
@@ -40,18 +56,11 @@ class JmsSerializerTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $this->equalTo([1234]),
                 $this->equalTo($format),
-                $this->callback(function (SerializationContext $context) use ($groups) {
-                    return $context->getExclusionStrategy() instanceof GroupsExclusionStrategy;
-                })
+                $this->identicalTo($context)
             )
         ;
 
-        $serializer = new JmsSerializer($this->jmsSerializer, $groups, $format);
+        $serializer = new JmsSerializer($this->jmsSerializer, $format, $context);
         $serializer->serialize([1234]);
-    }
-
-    protected function setUp()
-    {
-        $this->jmsSerializer = $this->getMockBuilder(SerializerInterface::class)->getMockForAbstractClass();
     }
 }

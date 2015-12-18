@@ -6,7 +6,7 @@ use TreeHouse\Queue\Message\Message;
 use TreeHouse\Queue\Message\Publisher\MessagePublisherInterface;
 
 /**
- * Retries the message, but with the priority decreasing with every attempt
+ * Retries the message, but with the priority decreasing with every attempt.
  */
 class DeprioritizeStrategy implements RetryStrategyInterface
 {
@@ -34,10 +34,10 @@ class DeprioritizeStrategy implements RetryStrategyInterface
     }
 
     /**
-     * Creates a new message to retry
+     * Creates a new message to retry.
      *
      * @param Message $message
-     * @param integer $attempt
+     * @param int     $attempt
      *
      * @return Message
      */
@@ -46,7 +46,7 @@ class DeprioritizeStrategy implements RetryStrategyInterface
         // decrease priority with every attempt
         $priority = $message->getPriority();
         if ($priority > 0) {
-            $priority--;
+            --$priority;
         }
 
         $newMessage = clone $message;

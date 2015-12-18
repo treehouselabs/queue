@@ -6,7 +6,7 @@ use TreeHouse\Queue\Message\Message;
 use TreeHouse\Queue\Message\Publisher\MessagePublisherInterface;
 
 /**
- * Retries a message, but with an increasing delay for every attempt
+ * Retries a message, but with an increasing delay for every attempt.
  */
 class BackoffStrategy implements RetryStrategyInterface
 {
@@ -16,22 +16,22 @@ class BackoffStrategy implements RetryStrategyInterface
     protected $publisher;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $cooldownTime;
 
     /**
      * @param MessagePublisherInterface $publisher
-     * @param integer                   $cooldownTime
+     * @param int                       $cooldownTime
      */
     public function __construct(MessagePublisherInterface $publisher, $cooldownTime = 600)
     {
-        $this->publisher    = $publisher;
+        $this->publisher = $publisher;
         $this->cooldownTime = $cooldownTime;
     }
 
     /**
-     * @param integer $cooldownTime
+     * @param int $cooldownTime
      */
     public function setCooldownTime($cooldownTime)
     {
@@ -39,7 +39,7 @@ class BackoffStrategy implements RetryStrategyInterface
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getCooldownTime()
     {
@@ -61,10 +61,10 @@ class BackoffStrategy implements RetryStrategyInterface
     }
 
     /**
-     * Creates a new message to retry
+     * Creates a new message to retry.
      *
      * @param Message $message
-     * @param integer $attempt
+     * @param int     $attempt
      *
      * @return Message
      */

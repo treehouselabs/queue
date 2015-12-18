@@ -5,12 +5,12 @@ namespace TreeHouse\Queue\Tests\Mock;
 class ObjectMock implements \JsonSerializable
 {
     /**
-     * @var integer
+     * @var int
      */
     protected $id;
 
     /**
-     * @param integer $id
+     * @param int $id
      */
     public function __construct($id)
     {
@@ -18,7 +18,7 @@ class ObjectMock implements \JsonSerializable
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getId()
     {

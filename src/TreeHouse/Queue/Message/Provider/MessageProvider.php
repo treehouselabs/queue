@@ -2,20 +2,22 @@
 
 namespace TreeHouse\Queue\Message\Provider;
 
+use TreeHouse\Queue\Amqp\EnvelopeInterface;
+use TreeHouse\Queue\Amqp\QueueInterface;
 use TreeHouse\Queue\Message\Message;
 use TreeHouse\Queue\Message\MessageProperties;
 
-class AmqpMessageProvider implements MessageProviderInterface
+class MessageProvider implements MessageProviderInterface
 {
     /**
-     * @var \AMQPQueue
+     * @var QueueInterface
      */
     protected $queue;
 
     /**
-     * @param \AMQPQueue $queue
+     * @param QueueInterface $queue
      */
-    public function __construct(\AMQPQueue $queue)
+    public function __construct(QueueInterface $queue)
     {
         $this->queue = $queue;
     }
@@ -29,8 +31,8 @@ class AmqpMessageProvider implements MessageProviderInterface
             return null;
         }
 
-        $id    = $envelope->getDeliveryTag();
-        $body  = $envelope->getBody();
+        $id = $envelope->getDeliveryTag();
+        $body = $envelope->getBody();
         $props = new MessageProperties($envelope->getHeaders());
 
         return new Message($body, $props, $id);
@@ -49,7 +51,7 @@ class AmqpMessageProvider implements MessageProviderInterface
      */
     public function nack(Message $message, $requeue = false)
     {
-        $this->queue->nack($message->getId(), $requeue ? AMQP_REQUEUE : null);
+        $this->queue->nack($message->getId(), $requeue ? QueueInterface::REQUEUE : null);
     }
 
     /**
@@ -57,7 +59,7 @@ class AmqpMessageProvider implements MessageProviderInterface
      */
     public function consume(callable $callback)
     {
-        $this->queue->consume(function(\AMQPEnvelope $envelope) use ($callback) {
+        $this->queue->consume(function(EnvelopeInterface $envelope) use ($callback) {
             $id    = $envelope->getDeliveryTag();
             $body  = $envelope->getBody();
             $props = new MessageProperties($envelope->getHeaders());
@@ -65,7 +67,7 @@ class AmqpMessageProvider implements MessageProviderInterface
             $message = new Message($body, $props, $id);
 
             $callback($message);
-            
+
             // release blocking thread back to php
             return false;
         });
