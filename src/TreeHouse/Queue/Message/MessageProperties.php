@@ -54,8 +54,8 @@ class MessageProperties implements \ArrayAccess
      * @param string $key
      *
      * @throws \OutOfBoundsException If the key does not exist
-     * @return mixed
      *
+     * @return mixed
      */
     public function get($key)
     {
