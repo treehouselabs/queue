@@ -90,4 +90,20 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(3, $message->getPriority());
     }
+
+    /**
+     * @test
+     */
+    public function it_can_get_and_set_headers()
+    {
+        $message = new Message('test');
+
+        $this->assertSame([], $message->getHeaders());
+        $this->assertFalse($message->getHeader('foo'));
+
+        $message->setHeader('foo', 'bar');
+
+        $this->assertSame(['foo' => 'bar'], $message->getHeaders());
+        $this->assertSame('bar', $message->getHeader('foo'));
+    }
 }

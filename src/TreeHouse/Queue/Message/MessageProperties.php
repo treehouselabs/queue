@@ -14,6 +14,9 @@ class MessageProperties implements \ArrayAccess
     const KEY_DELIVERY_MODE = 'delivery_mode';
     const KEY_PRIORITY = 'priority';
     const KEY_TIMESTAMP = 'timestamp';
+    const KEY_HEADERS = 'headers';
+
+    const KEY_DELAY = 'x-delay';
 
     /**
      * @var array

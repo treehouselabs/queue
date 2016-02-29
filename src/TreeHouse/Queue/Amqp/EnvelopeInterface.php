@@ -116,7 +116,7 @@ interface EnvelopeInterface
      *
      * @return string The message timestamp.
      */
-    public function getTimeStamp();
+    public function getTimestamp();
 
     /**
      * Get the message type.

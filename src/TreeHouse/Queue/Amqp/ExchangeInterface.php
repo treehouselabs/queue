@@ -12,6 +12,7 @@ interface ExchangeInterface
     const TYPE_FANOUT = 'fanout';
     const TYPE_TOPIC = 'topic';
     const TYPE_HEADERS = 'headers';
+    const TYPE_DELAYED = 'x-delayed-message';
 
     const NOPARAM = 0;
     const DURABLE = 1;

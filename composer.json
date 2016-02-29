@@ -12,11 +12,14 @@
   ],
   "require": {
     "php": ">=5.5",
-    "psr/log": "^1.0"
+    "psr/log": "^1.0",
+    "symfony/event-dispatcher": "^2.7|^3.0"
   },
   "require-dev": {
     "ext-amqp": "^1.7",
     "phpunit/phpunit": "^4.5",
+    "mockery/mockery": "^0.9.4",
+    "hamcrest/hamcrest-php": "^1.2.1",
     "doctrine/common": "^2.3",
     "doctrine/orm": "^2.3",
     "jms/serializer": "^0.14",

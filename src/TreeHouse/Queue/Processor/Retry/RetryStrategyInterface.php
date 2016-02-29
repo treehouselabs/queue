@@ -2,15 +2,16 @@
 
 namespace TreeHouse\Queue\Processor\Retry;
 
-use TreeHouse\Queue\Message\Message;
+use TreeHouse\Queue\Amqp\EnvelopeInterface;
 
 interface RetryStrategyInterface
 {
     /**
-     * @param Message $message The message to retry
-     * @param int     $attempt The next attempt value
+     * @param EnvelopeInterface $envelope The message to retry
+     * @param int               $attempt  The next attempt value
+     * @param \Exception        $exception
      *
      * @return bool The result to pass to the process function
      */
-    public function retry(Message $message, $attempt);
+    public function retry(EnvelopeInterface $envelope, $attempt, \Exception $exception = null);
 }

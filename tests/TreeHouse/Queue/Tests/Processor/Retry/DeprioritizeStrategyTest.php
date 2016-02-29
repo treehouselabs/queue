@@ -2,7 +2,11 @@
 
 namespace TreeHouse\Queue\Tests\Processor\Retry;
 
+use Mockery as Mock;
+use Mockery\MockInterface;
+use TreeHouse\Queue\Amqp\EnvelopeInterface;
 use TreeHouse\Queue\Message\Message;
+use TreeHouse\Queue\Message\MessageProperties;
 use TreeHouse\Queue\Message\Publisher\MessagePublisherInterface;
 use TreeHouse\Queue\Processor\Retry\DeprioritizeStrategy;
 use TreeHouse\Queue\Processor\Retry\RetryProcessor;
@@ -14,69 +18,83 @@ class DeprioritizeStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function it_can_retry_a_message()
     {
-        $attempt = 2;
+        $id = 1234;
         $body = 'test';
         $routingKey = 'foo';
         $priority = 3;
+        $headers = ['foo' => 'bar'];
 
-        $message = new Message($body);
-        $message->setRoutingKey($routingKey);
-        $message->setPriority($priority);
-        $message->getProperties()->set('foo', 'bar');
+        /** @var MockInterface|EnvelopeInterface $envelope */
+        $envelope = Mock::mock(EnvelopeInterface::class);
+        $envelope->shouldReceive('getDeliveryTag')->andReturn($id);
+        $envelope->shouldReceive('getBody')->andReturn($body);
+        $envelope->shouldReceive('getRoutingKey')->andReturn($routingKey);
+        $envelope->shouldReceive('getPriority')->andReturn($priority);
+        $envelope->shouldReceive('getHeaders')->andReturn($headers);
+        $envelope->shouldReceive('getContentType')->andReturn(MessageProperties::CONTENT_TYPE_BASIC);
+        $envelope->shouldReceive('getDeliveryMode')->andReturn(MessageProperties::DELIVERY_MODE_PERSISTENT);
+
+        $attempt = 2;
 
         $publisher = $this->createPublisherMock();
         $publisher
-            ->expects($this->once())
-            ->method('publish')
+            ->shouldReceive('publish')
+            ->once()
             ->with(
-                $this->callback(function (Message $retryMessage) use ($message, $attempt) {
+                Mock::on(function (Message $retryMessage) use ($envelope, $attempt) {
                     $this->assertSame(
-                        $message->getBody(),
+                        $envelope->getDeliveryTag(),
+                        $retryMessage->getId(),
+                        'Delivery tag of the retry-message is not the same'
+                    );
+
+                    $this->assertSame(
+                        $envelope->getBody(),
                         $retryMessage->getBody(),
                         'Body of the retry-message is not the same'
                     );
 
                     $this->assertSame(
-                        $message->getRoutingKey(),
+                        $envelope->getRoutingKey(),
                         $retryMessage->getRoutingKey(),
                         'Routing key of the retry-message is not the same'
                     );
 
-                    $this->assertSame(
-                        $message->getProperties()->get('foo'),
-                        $retryMessage->getProperties()->get('foo'),
-                        'Properties are not properly cloned'
+                    $this->assertArraySubset(
+                        $envelope->getHeaders(),
+                        $retryMessage->getHeaders(),
+                        'Headers are not properly cloned'
                     );
 
                     $this->assertSame(
                         $retryMessage->getPriority(),
-                        $message->getPriority() - 1,
+                        $envelope->getPriority() - 1,
                         'Priority should decrease with 1'
                     );
 
                     $this->assertSame(
                         $attempt,
-                        $retryMessage->getProperties()->get(RetryProcessor::PROPERTY_KEY),
-                        'There should be an "attempt" key in the retry message\'s properties'
+                        $retryMessage->getHeader(RetryProcessor::PROPERTY_KEY),
+                        'There should be an "attempt" header in the retry message'
                     );
 
                     return true;
                 })
             )
-            ->will($this->returnValue(true))
+            ->andReturn(true)
         ;
 
         $strategy = new DeprioritizeStrategy($publisher);
-        $result = $strategy->retry($message, $attempt);
+        $result = $strategy->retry($envelope, $attempt);
 
         $this->assertTrue($result);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MessagePublisherInterface
+     * @return MockInterface|MessagePublisherInterface
      */
     protected function createPublisherMock()
     {
-        return $this->getMockBuilder(MessagePublisherInterface::class)->getMockForAbstractClass();
+        return Mock::mock(MessagePublisherInterface::class);
     }
 }

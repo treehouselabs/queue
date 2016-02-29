@@ -166,4 +166,48 @@ class Message
     {
         return $this->properties->get(MessageProperties::KEY_TIMESTAMP);
     }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setHeader($name, $value)
+    {
+        $headers = $this->getHeaders();
+        $headers[$name] = $value;
+
+        $this->properties[MessageProperties::KEY_HEADERS] = $headers;
+    }
+
+    /**
+     * Get a specific message header.
+     *
+     * @param string $name Name of the header to get the value from.
+     *
+     * @return string|bool The contents of the specified header or false if not set.
+     */
+    public function getHeader($name)
+    {
+        $headers = $this->getHeaders();
+
+        if (!isset($headers[$name])) {
+            return false;
+        }
+
+        return $headers[$name];
+    }
+
+    /**
+     * Get the headers of the message.
+     *
+     * @return array An array of key value pairs associated with the message.
+     */
+    public function getHeaders()
+    {
+        if (!isset($this->properties[MessageProperties::KEY_HEADERS])) {
+            $this->properties[MessageProperties::KEY_HEADERS] = [];
+        }
+
+        return $this->properties[MessageProperties::KEY_HEADERS];
+    }
 }

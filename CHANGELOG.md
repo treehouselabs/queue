@@ -7,6 +7,23 @@ For a complete list of releases, see the [releases page][0].
 [0]: https://github.com/treehouselabs/queue/releases
 
 
+## v0.2.0
+
+### Changes
+* Added support for delayed messages, via the _delayed message exchange_ plugin
+* Added `ack`/`nack` support to consumers
+* Consumers now work via a callback that calls the given processor
+* Consumers now dispatch events when consuming messages
+* Added getter/setter for headers on `Message` class
+
+### Breaking changes
+* Moved `TreeHouse\Queue\Consumer` to `TreeHouse\Queue\Consumer\Consumer`
+* Consumers now work with `EnvelopeInterface` instances instead of `Message`
+  instances, which are only for composing new messages.
+* Removed `MessageProvider` and its interface, as it was basically a copy of
+  the consumer class. Instead, consumers now work directly with a queue/processor.
+
+
 ## v0.1.0
 
 ### Fixes

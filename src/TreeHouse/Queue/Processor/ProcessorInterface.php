@@ -2,18 +2,19 @@
 
 namespace TreeHouse\Queue\Processor;
 
-use TreeHouse\Queue\Message\Message;
+use TreeHouse\Queue\Amqp\EnvelopeInterface;
 
 interface ProcessorInterface
 {
     /**
-     * Processes a message and returns a boolean value. The result should incidate whether the message could be
-     * processed, regardless of the outcome. Only in case of an error, after which you want to process the message again
-     * later, should you return false here. In all other cases this should return true.
+     * Processes a message and returns the result.
      *
-     * @param Message $message
+     * Any exceptions thrown here will nack the message and - according to your
+     * setup - retry, dead-letter, or discard them.
      *
-     * @return bool False if the message could not be processed, true otherwise
+     * @param EnvelopeInterface $envelope
+     *
+     * @return mixed The processing result
      */
-    public function process(Message $message);
+    public function process(EnvelopeInterface $envelope);
 }
