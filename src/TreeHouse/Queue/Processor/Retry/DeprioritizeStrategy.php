@@ -2,13 +2,13 @@
 
 namespace TreeHouse\Queue\Processor\Retry;
 
-use TreeHouse\Queue\Message\Message;
+use TreeHouse\Queue\Amqp\EnvelopeInterface;
 use TreeHouse\Queue\Message\Publisher\MessagePublisherInterface;
 
 /**
  * Retries the message, but with the priority decreasing with every attempt.
  */
-class DeprioritizeStrategy implements RetryStrategyInterface
+class DeprioritizeStrategy extends AbstractStrategy
 {
     /**
      * @var MessagePublisherInterface
@@ -26,33 +26,17 @@ class DeprioritizeStrategy implements RetryStrategyInterface
     /**
      * @inheritdoc
      */
-    public function retry(Message $message, $attempt)
-    {
-        $message = $this->createRetryMessage($message, $attempt);
-
-        return $this->publisher->publish($message);
-    }
-
-    /**
-     * Creates a new message to retry.
-     *
-     * @param Message $message
-     * @param int     $attempt
-     *
-     * @return Message
-     */
-    protected function createRetryMessage(Message $message, $attempt)
+    public function retry(EnvelopeInterface $envelope, $attempt, \Exception $exception = null)
     {
         // decrease priority with every attempt
-        $priority = $message->getPriority();
+        $priority = $envelope->getPriority();
         if ($priority > 0) {
             --$priority;
         }
 
-        $newMessage = clone $message;
-        $newMessage->setPriority($priority);
-        $newMessage->getProperties()->set(RetryProcessor::PROPERTY_KEY, $attempt);
+        $message = $this->createRetryMessage($envelope, $attempt, $exception);
+        $message->setPriority($priority);
 
-        return $newMessage;
+        return $this->publisher->publish($message);
     }
 }

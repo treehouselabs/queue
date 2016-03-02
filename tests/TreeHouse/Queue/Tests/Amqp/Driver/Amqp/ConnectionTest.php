@@ -2,6 +2,8 @@
 
 namespace TreeHouse\Queue\Tests\Amqp\Driver\Amqp;
 
+use Mockery as Mock;
+use Mockery\MockInterface;
 use TreeHouse\Queue\Amqp\Driver\Amqp\Connection;
 use TreeHouse\Queue\Tests\Amqp\Driver\AbstractDriverConnectionTest;
 
@@ -14,9 +16,10 @@ class ConnectionTest extends AbstractDriverConnectionTest
      */
     public function test_that_it_closes_on_destruct()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|\AMQPConnection $delegate */
-        $delegate = $this->getMockBuilder(\AMQPConnection::class)->setMethods(['disconnect'])->getMock();
-        $delegate->expects($this->once())->method('disconnect');
+        /** @var MockInterface|\AMQPConnection $delegate */
+        $delegate = Mock::mock(\AMQPConnection::class);
+        $delegate->shouldReceive('connect');
+        $delegate->shouldReceive('disconnect')->once();
 
         $conn = new Connection($delegate);
         $conn->connect();

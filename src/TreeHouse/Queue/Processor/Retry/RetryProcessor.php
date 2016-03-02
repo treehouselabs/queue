@@ -3,8 +3,8 @@
 namespace TreeHouse\Queue\Processor\Retry;
 
 use Psr\Log\LoggerInterface;
+use TreeHouse\Queue\Amqp\EnvelopeInterface;
 use TreeHouse\Queue\Exception\ProcessExhaustedException;
-use TreeHouse\Queue\Message\Message;
 use TreeHouse\Queue\Processor\ProcessorInterface;
 
 /**
@@ -35,11 +35,6 @@ class RetryProcessor implements ProcessorInterface
     protected $maxAttempts = 2;
 
     /**
-     * @var int
-     */
-    protected $cooldownTime = 600;
-
-    /**
      * @param ProcessorInterface     $processor
      * @param RetryStrategyInterface $strategy
      * @param LoggerInterface        $logger
@@ -68,22 +63,6 @@ class RetryProcessor implements ProcessorInterface
     }
 
     /**
-     * @param int $cooldownTime
-     */
-    public function setCooldownTime($cooldownTime)
-    {
-        $this->cooldownTime = $cooldownTime;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCooldownTime()
-    {
-        return $this->cooldownTime;
-    }
-
-    /**
      * @param int $maxAttempts
      */
     public function setMaxAttempts($maxAttempts)
@@ -102,35 +81,32 @@ class RetryProcessor implements ProcessorInterface
     /**
      * @inheritdoc
      */
-    public function process(Message $message)
+    public function process(EnvelopeInterface $envelope)
     {
         try {
-            $result = $this->processor->process($message);
+            $result = $this->processor->process($envelope);
         } catch (\Exception $exception) {
-            $result = false;
-
             if ($this->logger) {
-                $this->logger->error($exception->getMessage(), ['message' => $message->getId()]);
+                $this->logger->error($exception->getMessage(), ['message' => $envelope->getDeliveryTag()]);
             }
-        }
 
-        if ($result !== true) {
-            $result = $this->retryMessage($message);
+            $result = $this->retryMessage($envelope, $exception);
         }
 
         return $result;
     }
 
     /**
-     * @param Message $message
+     * @param EnvelopeInterface $envelope
+     * @param \Exception        $exception
      *
      * @throws ProcessExhaustedException
      *
      * @return bool
      */
-    protected function retryMessage(Message $message)
+    protected function retryMessage(EnvelopeInterface $envelope, \Exception $exception = null)
     {
-        $attempt = $this->getAttemptValue($message);
+        $attempt = $this->getAttemptValue($envelope);
         if ($attempt >= $this->maxAttempts) {
             throw new ProcessExhaustedException(sprintf('Exhausted after failing %d attempt(s)', $attempt));
         }
@@ -139,24 +115,23 @@ class RetryProcessor implements ProcessorInterface
             $this->logger->debug(sprintf('Requeueing message (%d attempts left)', $this->maxAttempts - $attempt));
         }
 
-        return $this->strategy->retry($message, ++$attempt);
+        return $this->strategy->retry($envelope, ++$attempt, $exception);
     }
 
     /**
-     * @param Message $message
+     * @param EnvelopeInterface $envelope
      *
      * @throws \LogicException
      *
      * @return int
      */
-    protected function getAttemptValue(Message $message)
+    protected function getAttemptValue(EnvelopeInterface $envelope)
     {
-        $properties = $message->getProperties();
-        if (!$properties->has(self::PROPERTY_KEY)) {
+        if (false === $attempt = $envelope->getHeader(self::PROPERTY_KEY)) {
             return 1;
         }
 
-        $attempt = (integer) $properties->get(self::PROPERTY_KEY);
+        $attempt = (integer) $attempt;
 
         if ($attempt < 1) {
             throw new \LogicException(

@@ -2,13 +2,14 @@
 
 namespace TreeHouse\Queue\Processor\Retry;
 
+use TreeHouse\Queue\Amqp\EnvelopeInterface;
 use TreeHouse\Queue\Message\Message;
 use TreeHouse\Queue\Message\Publisher\MessagePublisherInterface;
 
 /**
  * Retries a message, but with an increasing delay for every attempt.
  */
-class BackoffStrategy implements RetryStrategyInterface
+class BackoffStrategy extends AbstractStrategy
 {
     /**
      * @var MessagePublisherInterface
@@ -49,30 +50,14 @@ class BackoffStrategy implements RetryStrategyInterface
     /**
      * @inheritdoc
      */
-    public function retry(Message $message, $attempt)
+    public function retry(EnvelopeInterface $envelope, $attempt, \Exception $exception = null)
     {
-        $message = $this->createRetryMessage($message, $attempt);
+        $message = $this->createRetryMessage($envelope, $attempt, $exception);
 
         // multiply cooldown time by the attempt number,
         $cooldownTime = $attempt * $this->cooldownTime;
         $cooldownDate = \DateTime::createFromFormat('U', (time() + $cooldownTime));
 
         return $this->publisher->publish($message, $cooldownDate);
-    }
-
-    /**
-     * Creates a new message to retry.
-     *
-     * @param Message $message
-     * @param int     $attempt
-     *
-     * @return Message
-     */
-    protected function createRetryMessage(Message $message, $attempt)
-    {
-        $newMessage = clone $message;
-        $newMessage->getProperties()->set(RetryProcessor::PROPERTY_KEY, $attempt);
-
-        return $newMessage;
     }
 }

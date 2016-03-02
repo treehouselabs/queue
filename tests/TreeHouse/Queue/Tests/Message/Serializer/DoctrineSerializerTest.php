@@ -5,6 +5,7 @@ namespace TreeHouse\Queue\Tests\Message\Serializer;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
+use Mockery as Mock;
 use TreeHouse\Queue\Message\Serializer\DoctrineSerializer;
 use TreeHouse\Queue\Tests\Mock\ObjectMock;
 
@@ -20,25 +21,18 @@ class DoctrineSerializerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $meta = $this->getMockBuilder(ClassMetadata::class)->getMock();
-        $meta->expects($this->any())
-             ->method('getIdentifierValues')
-             ->will($this->returnCallback(
-                 function (ObjectMock $value) {
-                     return ['id' => $value->getId()];
-                 }
-             )
-             );
-
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
-        $manager->expects($this->any())->method('getClassMetadata')->will($this->returnValue($meta));
-
-        $this->doctrine = $this->getMockBuilder(ManagerRegistry::class)->getMock();
-        $this->doctrine
-            ->expects($this->any())
-            ->method('getManager')
-            ->will($this->returnValue($manager))
+        $meta = Mock::mock(ClassMetadata::class);
+        $meta->shouldReceive('getIdentifierValues')
+            ->andReturnUsing(function (ObjectMock $value) {
+                return ['id' => $value->getId()];
+            })
         ;
+
+        $manager = Mock::mock(ObjectManager::class);
+        $manager->shouldReceive('getClassMetadata')->andReturn($meta);
+
+        $this->doctrine = Mock::mock(ManagerRegistry::class);
+        $this->doctrine->shouldReceive('getManager')->andReturn($manager);
     }
 
     /**

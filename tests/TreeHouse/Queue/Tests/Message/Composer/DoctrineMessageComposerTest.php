@@ -4,6 +4,8 @@ namespace TreeHouse\Queue\Tests\Message\Composer;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Mockery as Mock;
+use Mockery\MockInterface;
 use TreeHouse\Queue\Message\Composer\DoctrineMessageComposer;
 use TreeHouse\Queue\Message\Serializer\JsonSerializer;
 use TreeHouse\Queue\Tests\Mock\ObjectMock;
@@ -73,24 +75,24 @@ class DoctrineMessageComposerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     * @return MockInterface|ManagerRegistry
      */
     private function getDoctrineMock()
     {
-        $repo = $this->getMockBuilder(ObjectRepository::class)->getMockForAbstractClass();
-        $repo->expects($this->any())
-            ->method('find')
-            ->will($this->returnCallback(function ($value) {
+        $repo = Mock::mock(ObjectRepository::class);
+        $repo
+            ->shouldReceive('find')
+            ->andReturnUsing(function ($value) {
                 if (is_array($value) && is_numeric(current($value))) {
                     $value = current($value);
                 }
 
                 return is_numeric($value) ? new ObjectMock(intval($value)) : null;
-            }))
+            })
         ;
 
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)->getMockForAbstractClass();
-        $doctrine->expects($this->any())->method('getRepository')->will($this->returnValue($repo));
+        $doctrine = Mock::mock(ManagerRegistry::class);
+        $doctrine->shouldReceive('getRepository')->andReturn($repo);
 
         return $doctrine;
     }

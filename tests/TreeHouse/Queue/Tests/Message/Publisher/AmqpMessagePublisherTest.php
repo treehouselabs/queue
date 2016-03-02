@@ -2,6 +2,8 @@
 
 namespace TreeHouse\Queue\Tests\Message\Publisher;
 
+use Mockery as Mock;
+use Mockery\MockInterface;
 use TreeHouse\Queue\Amqp\Driver\Amqp\Publisher\AmqpMessagePublisher;
 use TreeHouse\Queue\Amqp\ExchangeInterface;
 use TreeHouse\Queue\Message\Composer\DefaultMessageComposer;
@@ -14,7 +16,7 @@ use TreeHouse\Queue\Message\Serializer\PhpSerializer;
 class AmqpMessagePublisherTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ExchangeInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var ExchangeInterface|MockInterface
      */
     protected $exchange;
 
@@ -33,12 +35,7 @@ class AmqpMessagePublisherTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->exchange = $this
-            ->getMockBuilder(ExchangeInterface::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass()
-        ;
-
+        $this->exchange = Mock::mock(ExchangeInterface::class);
         $this->composer = new DefaultMessageComposer(new PhpSerializer());
         $this->publisher = new AmqpMessagePublisher($this->exchange, $this->composer);
     }
@@ -84,10 +81,10 @@ class AmqpMessagePublisherTest extends \PHPUnit_Framework_TestCase
         $message = $this->publisher->createMessage($body);
 
         $this->exchange
-            ->expects($this->once())
-            ->method('publish')
-            ->with($body, null, ExchangeInterface::NOPARAM)
-            ->will($this->returnValue(true))
+            ->shouldReceive('publish')
+            ->once()
+            ->with($body, null, ExchangeInterface::NOPARAM, $message->getProperties()->toArray())
+            ->andReturn(true)
         ;
 
         $this->assertTrue($this->publisher->publish($message));
@@ -104,13 +101,37 @@ class AmqpMessagePublisherTest extends \PHPUnit_Framework_TestCase
         $message->setRoutingKey($route);
 
         $this->exchange
-            ->expects($this->once())
-            ->method('publish')
-            ->with($body, $route, ExchangeInterface::IMMEDIATE)
-            ->will($this->returnValue(true))
+            ->shouldReceive('publish')
+            ->once()
+            ->with($body, $route, ExchangeInterface::IMMEDIATE, $message->getProperties()->toArray())
+            ->andReturn(true)
         ;
 
         $this->assertTrue($this->publisher->publish($message, null, ExchangeInterface::IMMEDIATE));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_publish_a_message_with_a_delay()
+    {
+        $body = 'test';
+        $date = new \DateTime('+10 seconds');
+        $message = $this->publisher->createMessage($body);
+
+        $props = $message->getProperties()->toArray();
+        $props[MessageProperties::KEY_HEADERS] = [
+            MessageProperties::KEY_DELAY => 10000
+        ];
+
+        $this->exchange
+            ->shouldReceive('publish')
+            ->once()
+            ->with($body, null, ExchangeInterface::NOPARAM, $props)
+            ->andReturn(true)
+        ;
+
+        $this->assertTrue($this->publisher->publish($message, $date));
     }
 
     /**
@@ -122,10 +143,7 @@ class AmqpMessagePublisherTest extends \PHPUnit_Framework_TestCase
     {
         $message = $this->publisher->createMessage('test');
 
-        $this->exchange
-            ->expects($this->never())
-            ->method('publish')
-        ;
+        $this->exchange->shouldReceive('publish')->never();
 
         $this->publisher->publish($message, new \DateTime('-10 minutes'));
     }

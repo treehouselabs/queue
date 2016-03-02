@@ -74,7 +74,7 @@ abstract class AbstractDriverEnvelopeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($priority, $envelope->getPriority());
         $this->assertSame($replyTo, $envelope->getReplyTo());
         $this->assertSame($routingKey, $envelope->getRoutingKey());
-        $this->assertSame($timestamp, $envelope->getTimeStamp());
+        $this->assertSame($timestamp, $envelope->getTimestamp());
         $this->assertSame($type, $envelope->getType());
         $this->assertSame($userId, $envelope->getUserId());
     }

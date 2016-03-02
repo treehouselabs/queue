@@ -4,12 +4,14 @@ namespace TreeHouse\Queue\Tests\Message\Serializer;
 
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
+use Mockery as Mock;
+use Mockery\MockInterface;
 use TreeHouse\Queue\Message\Serializer\JmsSerializer;
 
 class JmsSerializerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|SerializerInterface
+     * @var MockInterface|SerializerInterface
      */
     protected $jmsSerializer;
 
@@ -18,7 +20,7 @@ class JmsSerializerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->jmsSerializer = $this->getMockBuilder(SerializerInterface::class)->getMockForAbstractClass();
+        $this->jmsSerializer = Mock::mock(SerializerInterface::class);
     }
 
     /**
@@ -36,7 +38,7 @@ class JmsSerializerTest extends \PHPUnit_Framework_TestCase
      */
     public function it_can_serialize()
     {
-        $this->jmsSerializer->expects($this->once())->method('serialize');
+        $this->jmsSerializer->shouldReceive('serialize')->once();
 
         $serializer = new JmsSerializer($this->jmsSerializer);
         $serializer->serialize([1234]);
@@ -48,16 +50,12 @@ class JmsSerializerTest extends \PHPUnit_Framework_TestCase
     public function it_can_serialize_with_context_and_format()
     {
         $format = 'yml';
-        $context = SerializationContext::create()->setGroups(['foo']);
+        $context = Mock::mock(SerializationContext::class);
 
         $this->jmsSerializer
-            ->expects($this->once())
-            ->method('serialize')
-            ->with(
-                $this->equalTo([1234]),
-                $this->equalTo($format),
-                $this->identicalTo($context)
-            )
+            ->shouldReceive('serialize')
+            ->once()
+            ->with([1234], $format, $context)
         ;
 
         $serializer = new JmsSerializer($this->jmsSerializer, $format, $context);

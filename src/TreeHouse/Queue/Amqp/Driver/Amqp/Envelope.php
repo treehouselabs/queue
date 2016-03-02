@@ -142,7 +142,7 @@ class Envelope implements EnvelopeInterface
     /**
      * @inheritdoc
      */
-    public function getTimeStamp()
+    public function getTimestamp()
     {
         return $this->delegate->getTimeStamp();
     }
