@@ -22,6 +22,7 @@ For a complete list of releases, see the [releases page][0].
   instances, which are only for composing new messages.
 * Removed `MessageProvider` and its interface, as it was basically a copy of
   the consumer class. Instead, consumers now work directly with a queue/processor.
+* Exchanges and queues are no longer declared automatically on factory creation
 
 
 ## v0.1.0

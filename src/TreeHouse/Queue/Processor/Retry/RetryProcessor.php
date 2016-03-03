@@ -3,6 +3,7 @@
 namespace TreeHouse\Queue\Processor\Retry;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use TreeHouse\Queue\Amqp\EnvelopeInterface;
 use TreeHouse\Queue\Exception\ProcessExhaustedException;
 use TreeHouse\Queue\Processor\ProcessorInterface;
@@ -43,7 +44,7 @@ class RetryProcessor implements ProcessorInterface
     {
         $this->processor = $processor;
         $this->strategy = $strategy;
-        $this->logger = $logger;
+        $this->logger = $logger ?: new NullLogger();
     }
 
     /**
@@ -86,9 +87,8 @@ class RetryProcessor implements ProcessorInterface
         try {
             $result = $this->processor->process($envelope);
         } catch (\Exception $exception) {
-            if ($this->logger) {
-                $this->logger->error($exception->getMessage(), ['message' => $envelope->getDeliveryTag()]);
-            }
+            $this->logger->error($exception->getMessage(), ['message' => $envelope->getDeliveryTag()]);
+            $this->logger->debug($exception->getTraceAsString());
 
             $result = $this->retryMessage($envelope, $exception);
         }
@@ -111,9 +111,7 @@ class RetryProcessor implements ProcessorInterface
             throw new ProcessExhaustedException(sprintf('Exhausted after failing %d attempt(s)', $attempt));
         }
 
-        if ($this->logger) {
-            $this->logger->debug(sprintf('Requeueing message (%d attempts left)', $this->maxAttempts - $attempt));
-        }
+        $this->logger->debug(sprintf('Requeueing message (%d attempts left)', $this->maxAttempts - $attempt));
 
         return $this->strategy->retry($envelope, ++$attempt, $exception);
     }

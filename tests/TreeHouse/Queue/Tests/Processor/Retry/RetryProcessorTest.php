@@ -72,6 +72,8 @@ class RetryProcessorTest extends \PHPUnit_Framework_TestCase
         $inner->shouldReceive('process')->once()->andThrow($exception);
 
         $envelope = $this->createEnvelopeMock(1);
+        $envelope->shouldReceive('getDeliveryTag')->andReturnNull();
+
         $result = $processor->process($envelope);
 
         $this->assertTrue($result, 'The ->process() method should return the value from the strategy');
@@ -90,6 +92,7 @@ class RetryProcessorTest extends \PHPUnit_Framework_TestCase
 
         // create message for second attempt
         $envelope = $this->createEnvelopeMock(2);
+        $envelope->shouldReceive('getDeliveryTag')->andReturnNull();
 
         $processor = new RetryProcessor($inner, $strategy);
         $processor->setMaxAttempts(2);
