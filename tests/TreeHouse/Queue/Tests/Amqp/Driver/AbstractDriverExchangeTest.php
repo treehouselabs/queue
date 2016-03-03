@@ -43,6 +43,9 @@ abstract class AbstractDriverExchangeTest extends \PHPUnit_Framework_TestCase
 
         $exchange1 = $this->factory->createExchange($channel, 'exchg1');
         $exchange2 = $this->factory->createExchange($channel, 'exchg2');
+        $exchange1->declareExchange();
+        $exchange2->declareExchange();
+
         $routingKey = 'test';
 
         $this->assertTrue($exchange1->bind($exchange2->getName(), $routingKey));
@@ -71,6 +74,7 @@ abstract class AbstractDriverExchangeTest extends \PHPUnit_Framework_TestCase
         $conn = $this->factory->createConnection('localhost');
         $channel = $this->factory->createChannel($conn);
         $exchange = $this->factory->createExchange($channel, 'exchg1');
+        $exchange->declareExchange();
 
         $conn->close();
 
@@ -105,6 +109,9 @@ abstract class AbstractDriverExchangeTest extends \PHPUnit_Framework_TestCase
         $channel = $this->factory->createChannel($conn);
         $exchange1 = $this->factory->createExchange($channel, 'exchg1');
         $exchange2 = $this->factory->createExchange($channel, 'exchg2');
+
+        $exchange1->declareExchange();
+        $exchange2->declareExchange();
 
         $exchange1->bind($exchange2->getName(), 'test');
 

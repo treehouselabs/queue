@@ -37,9 +37,9 @@ class AmqpFactory implements FactoryInterface
             $connection->connect();
         }
 
-        $channel = new \AMQPChannel($connection->getDelegate());
+        $delegate = new \AMQPChannel($connection->getDelegate());
 
-        return new Channel($channel, $connection);
+        return new Channel($delegate, $connection);
     }
 
     /**
@@ -52,15 +52,13 @@ class AmqpFactory implements FactoryInterface
         $flags = null,
         array $args = []
     ) {
-        $exchange = new \AMQPExchange($channel->getDelegate());
-        $exchange->setName($name);
-        $exchange->setType($type);
-        $exchange->setFlags(Exchange::convertToDelegateFlags($flags));
-        $exchange->setArguments($args);
+        $delegate = new \AMQPExchange($channel->getDelegate());
+        $delegate->setName($name);
+        $delegate->setType($type);
+        $delegate->setFlags(Exchange::convertToDelegateFlags($flags));
+        $delegate->setArguments($args);
 
-        $exchange->declareExchange();
-
-        return new Exchange($exchange, $channel);
+        return new Exchange($delegate, $channel);
     }
 
     /**
@@ -68,16 +66,14 @@ class AmqpFactory implements FactoryInterface
      */
     public function createQueue(ChannelInterface $channel, $name = null, $flags = null, array $args = [])
     {
-        $queue = new \AMQPQueue($channel->getDelegate());
-        $queue->setFlags(Queue::convertToDelegateFlags($flags));
-        $queue->setArguments($args);
+        $delegate = new \AMQPQueue($channel->getDelegate());
+        $delegate->setFlags(Queue::convertToDelegateFlags($flags));
+        $delegate->setArguments($args);
 
         if (null !== $name) {
-            $queue->setName($name);
+            $delegate->setName($name);
         }
 
-        $queue->declareQueue();
-
-        return new Queue($queue, $channel);
+        return new Queue($delegate, $channel);
     }
 }

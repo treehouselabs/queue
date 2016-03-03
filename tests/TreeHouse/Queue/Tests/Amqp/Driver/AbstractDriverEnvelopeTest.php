@@ -52,7 +52,11 @@ abstract class AbstractDriverEnvelopeTest extends \PHPUnit_Framework_TestCase
         ];
 
         $exchange = $this->getExchange();
+        $exchange->declareExchange();
+
         $queue = $this->getQueue();
+        $queue->declareQueue();
+
         $queue->bind($exchange->getName(), $routingKey);
 
         $exchange->publish($body, $routingKey, null, $properties);
