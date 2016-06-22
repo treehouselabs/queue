@@ -15,6 +15,7 @@ For a complete list of releases, see the [releases page][0].
 * Consumers now work via a callback that calls the given processor
 * Consumers now dispatch events when consuming messages
 * Added getter/setter for headers on `Message` class
+* Added support to configure connection parameters
 
 ### Breaking changes
 * Moved `TreeHouse\Queue\Consumer` to `TreeHouse\Queue\Consumer\Consumer`
