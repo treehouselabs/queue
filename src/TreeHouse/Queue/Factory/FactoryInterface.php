@@ -15,10 +15,11 @@ interface FactoryInterface
      * @param string $user
      * @param string $pass
      * @param string $vhost
+     * @param array  $connectionParams
      *
      * @return ConnectionInterface
      */
-    public function createConnection($host, $port = 5672, $user = 'guest', $pass = 'guest', $vhost = '/');
+    public function createConnection($host, $port = 5672, $user = 'guest', $pass = 'guest', $vhost = '/', array $connectionParams = []);
 
     /**
      * @param ConnectionInterface $connection
