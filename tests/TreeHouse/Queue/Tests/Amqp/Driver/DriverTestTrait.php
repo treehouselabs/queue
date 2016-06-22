@@ -76,9 +76,9 @@ class CachedFactory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createConnection($host, $port = 5672, $user = 'guest', $pass = 'guest', $vhost = '/')
+    public function createConnection($host, $port = 5672, $user = 'guest', $pass = 'guest', $vhost = '/', array $connectionParams = [])
     {
-        $conn = $this->delegate->createConnection($host, $port, $user, $pass, $vhost);
+        $conn = $this->delegate->createConnection($host, $port, $user, $pass, $vhost, $connectionParams);
         $this->connections[] = $conn;
 
         return $conn;

@@ -12,17 +12,18 @@ class AmqpFactory implements FactoryInterface
     /**
      * @inheritdoc
      */
-    public function createConnection($host, $port = 5672, $user = 'guest', $pass = 'guest', $vhost = '/')
+    public function createConnection($host, $port = 5672, $user = 'guest', $pass = 'guest', $vhost = '/', array $connectionParams = [])
     {
-        $delegate = new \AMQPConnection(
+        $delegate = new \AMQPConnection(array_merge(
             [
                 'host' => $host,
                 'port' => $port,
                 'login' => $user,
                 'password' => $pass,
                 'vhost' => $vhost,
-            ]
-        );
+            ],
+            $connectionParams
+        ));
 
         return new Connection($delegate);
     }
