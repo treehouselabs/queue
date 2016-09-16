@@ -7,6 +7,30 @@ For a complete list of releases, see the [releases page][0].
 [0]: https://github.com/treehouselabs/queue/releases
 
 
+## v0.3.0
+
+### Changes
+* Added `cancel` method to consumer
+* Added property to `ConsumeEvent` to indicate if further consuming should stop
+
+### Breaking changes
+* `TreeHouse\Queue\Consumer#consume()` has a different signature:
+
+  **Before:**
+
+  ```
+  public function consume($flags = QueueInterface::NOPARAM)
+  ```
+
+  **After:**
+
+  ```
+  public function consume($consumerTag = null, $flags = QueueInterface::NOPARAM)
+  ```
+* `TreeHouse\Queue\Amqp\Driver\Amqp\Queue#consume()` previously always returned 
+  false. It now respects the return value of the callback itself.
+
+
 ## v0.2.0
 
 ### Changes
