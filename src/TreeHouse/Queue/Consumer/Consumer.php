@@ -62,7 +62,7 @@ class Consumer implements ConsumerInterface
 
                     $this->ack($envelope);
 
-                    return $event->continue();
+                    return $event->shouldContinueConsuming();
                 } catch (\Exception $exception) {
                     $this->dispatcher->dispatch(QueueEvents::CONSUME_EXCEPTION, new ConsumeExceptionEvent($envelope, $exception));
 

@@ -20,7 +20,7 @@ class ConsumeEvent extends Event
     /**
      * @var bool
      */
-    private $continue;
+    private $continueConsuming;
 
     /**
      * @param EnvelopeInterface $envelope The envelope that was consumed
@@ -31,7 +31,7 @@ class ConsumeEvent extends Event
     {
         $this->envelope = $envelope;
         $this->result = $result;
-        $this->continue = $continue;
+        $this->continueConsuming = $continue;
     }
 
     /**
@@ -61,9 +61,9 @@ class ConsumeEvent extends Event
     /**
      * @return bool
      */
-    public function continue()
+    public function shouldContinueConsuming()
     {
-        return $this->continue;
+        return $this->continueConsuming;
     }
 
     /**
@@ -71,6 +71,6 @@ class ConsumeEvent extends Event
      */
     public function stopConsuming()
     {
-        $this->continue = false;
+        $this->continueConsuming = false;
     }
 }
