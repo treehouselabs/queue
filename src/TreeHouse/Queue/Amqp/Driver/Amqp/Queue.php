@@ -181,9 +181,7 @@ class Queue implements QueueInterface
     public function consume(callable $callback, $flags = null, $consumerTag = null)
     {
         $wrapper = function (\AMQPEnvelope $envelope) use ($callback) {
-            $callback(new Envelope($envelope));
-
-            return false;
+            return $callback(new Envelope($envelope));
         };
 
         $this->delegate->consume($wrapper, self::convertToDelegateFlags($flags), $consumerTag);
