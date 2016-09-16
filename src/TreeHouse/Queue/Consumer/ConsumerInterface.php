@@ -47,7 +47,16 @@ interface ConsumerInterface
     /**
      * Consumes messages.
      *
-     * @param int $flags A bitmask of any of the flags: QueueInterface::AUTOACK.
+     * @param string $consumerTag A string describing this consumer. Use to cancel
+     *                            subscription with cancel()
+     * @param int    $flags       A bitmask of any of the flags: QueueInterface::AUTOACK.
      */
-    public function consume($flags = QueueInterface::NOPARAM);
+    public function consume($consumerTag = null, $flags = QueueInterface::NOPARAM);
+
+    /**
+     * Cancels subscription to this queue for the given consumer tag.
+     *
+     * @param string $consumerTag
+     */
+    public function cancel($consumerTag = '');
 }

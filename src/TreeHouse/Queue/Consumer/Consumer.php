@@ -62,7 +62,7 @@ class Consumer implements ConsumerInterface
 
                     $this->ack($envelope);
 
-                    return $result;
+                    return $event->continue();
                 } catch (\Exception $exception) {
                     $this->dispatcher->dispatch(QueueEvents::CONSUME_EXCEPTION, new ConsumeExceptionEvent($envelope, $exception));
 
@@ -129,8 +129,16 @@ class Consumer implements ConsumerInterface
     /**
      * @inheritdoc
      */
-    public function consume($flags = QueueInterface::NOPARAM)
+    public function consume($consumerTag = null, $flags = QueueInterface::NOPARAM)
     {
-        $this->queue->consume($this->callback, $flags);
+        $this->queue->consume($this->callback, $flags, $consumerTag);
+    }
+
+    /**
+     * @param string $consumerTag
+     */
+    public function cancel($consumerTag = '')
+    {
+        $this->queue->cancel($consumerTag);
     }
 }

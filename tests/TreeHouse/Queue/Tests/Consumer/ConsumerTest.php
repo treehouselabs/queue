@@ -77,6 +77,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
     public function it_can_consume_messages()
     {
         $tag = 'abc123';
+        $consumerTag = 'dfg456';
         $flags = QueueInterface::AUTOACK;
         $result = true;
 
@@ -109,7 +110,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $this->queue
             ->shouldReceive('consume')
             ->once()
-            ->with(any(\Closure::class), $flags)
+            ->with(any(\Closure::class), $flags, $consumerTag)
             ->andReturnUsing(function (callable $callback) use ($envelope) {
                 return $callback($envelope);
             })
@@ -120,7 +121,7 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
         $this->processor->shouldReceive('process')->once()->with($envelope)->andReturn($result);
 
         $consumer = new Consumer($this->queue, $this->processor, $dispatcher);
-        $consumer->consume($flags);
+        $consumer->consume($consumerTag, $flags);
     }
 
     /**
@@ -249,5 +250,18 @@ class ConsumerTest extends \PHPUnit_Framework_TestCase
 
         $consumer = new Consumer($this->queue, $this->processor);
         $consumer->nack($envelope, $requeue);
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_cancel_a_queue_subscription()
+    {
+        $tag = 'abc123';
+
+        $this->queue->shouldReceive('cancel')->once()->with($tag);
+
+        $consumer = new Consumer($this->queue, $this->processor);
+        $consumer->cancel($tag);
     }
 }
