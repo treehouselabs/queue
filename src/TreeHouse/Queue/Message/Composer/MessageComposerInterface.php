@@ -14,5 +14,5 @@ interface MessageComposerInterface
      *
      * @return Message
      */
-    public function compose($payload, array $properties = null, $id = null, $routingKey = null);
+    public function compose($payload, array $properties = [], $id = null, $routingKey = null);
 }
