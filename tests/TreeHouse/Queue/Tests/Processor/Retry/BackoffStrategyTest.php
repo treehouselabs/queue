@@ -2,6 +2,7 @@
 
 namespace TreeHouse\Queue\Tests\Processor\Retry;
 
+use DateTime;
 use Mockery as Mock;
 use Mockery\MockInterface;
 use TreeHouse\Queue\Amqp\EnvelopeInterface;
@@ -36,7 +37,7 @@ class BackoffStrategyTest extends \PHPUnit_Framework_TestCase
 
         $attempt = 2;
         $cooldownTime = 60;
-        $cooldownDate = \DateTime::createFromFormat('U', time() + ($attempt * $cooldownTime));
+        $cooldownDate = DateTime::createFromFormat('U', time() + ($attempt * $cooldownTime));
 
         $publisher = $this->createPublisherMock();
         $publisher
@@ -76,7 +77,16 @@ class BackoffStrategyTest extends \PHPUnit_Framework_TestCase
 
                     return true;
                 }),
-                equalTo($cooldownDate)
+                Mock::on(function (DateTime $actual) use ($cooldownDate) {
+                    $this->assertEquals(
+                        $cooldownDate,
+                        $actual,
+                        '',
+                        2
+                    );
+
+                    return true;
+                })
             )
             ->andReturn(true)
         ;
