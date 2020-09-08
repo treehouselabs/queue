@@ -13,7 +13,7 @@
   "require": {
     "php": ">=5.5",
     "psr/log": "^1.0",
-    "symfony/event-dispatcher": "^3.0|^4.0"
+    "symfony/event-dispatcher": "^4.0|^5.0"
   },
   "require-dev": {
     "ext-amqp": "^1.7",
